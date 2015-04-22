@@ -19,7 +19,7 @@ def test_others():
     print("Length of g.members: {}".format(len(g.members)))
     print("First member: {}".format(g.members[0]))
     others = ABMtools.other(a, g.members)
-    print("Length of other members".format(len(others)))
+    print("Length of other members: {}".format(len(others)))
     print("First other member: {}".format(others[0]))
     try:
         print(others.index(a))

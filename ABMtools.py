@@ -311,10 +311,10 @@ def with_min(agentset, var):
     return [agent for agent in agentset if getattr(agent, var) == minval]
 
 
-def other(agent, agentset):
-    # Returns same agentset but minus given agent
-    agentset.remove(agent)
-    return agentset
+def other(instance, instanceset):
+    # Returns same instanceset but minus given agent
+    instanceset.remove(instance)
+    return instanceset
 
 def compile_typeset(individuals=None, iterables=None, instancetype=Agent):
     # Take instances or groups of instances of a given type and compile them into one list
