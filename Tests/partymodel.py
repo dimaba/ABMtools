@@ -25,8 +25,8 @@ class Partier(ABMtools.Agent):
     # Partiers use the 'group' attribute, which exists in ABMtools.Agent, to define their group
     # They are either happy or unhappy as function of the boringness of their group and the
     # current tolerance, and are either male (M) or female (F)
-    def __init__(self, sex, happy=False, *args, **kwargs):
-        ABMtools.Agent.__init__(self, *args, **kwargs)
+    def __init__(self, controller, sex, happy=False, *args, **kwargs):
+        ABMtools.Agent.__init__(self, controller, *args, **kwargs)
         self.sex = sex
         self.happy = happy
 
@@ -45,8 +45,7 @@ def setup(n=300, k=15, tolerance=70):
         # Populate the party
     c.create_groups(c.k)
     for _ in range(n):
-        a = Partier(controller=c, sex=random.choice(["M","F"]), group=random.choice([i.ident for i in c.groups]))
-        c.agents.append(a)
+        c.create_agents(1, Partier, sex=random.choice(["M","F"]), group=random.choice([i.ident for i in c.groups]))
 
         # Collect partygoers into groups
     c.census()
@@ -63,9 +62,11 @@ def setup(n=300, k=15, tolerance=70):
 def step(c, i):
         ### One Step
         # Stop if all turtles are happy
-    print("Happy agents: {}".format(sum([a.happy for a in c.agents])))
+    #print("Happy agents: {}".format(sum([a.happy for a in c.agents])))
     if all([a.happy for a in c.agents]):
         print("ALL AGENTS HAPPY, TERMINATING")
+        print("Step {}".format(i))
+        print("Boring groups: {}".format(c.boringgroups))
         for g in c.groups:
             print([str(i.sex) for i in g.members])
         sys.exit()
@@ -83,8 +84,8 @@ def step(c, i):
     c.count_boring()
 
         # FOR NOW WE WILL USE THE CONSOLE TO OUTPUT AN UPDATE EACH STEP
-    print("Step {}".format(i))
-    print("Boring groups: {}".format(c.boringgroups))
+    #print("Step {}".format(i))
+    #print("Boring groups: {}".format(c.boringgroups))
 
 c = setup()
 for i in range(200):
