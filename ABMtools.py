@@ -1,6 +1,7 @@
 class Agent:
     a_ident = 0
     def __init__(self, controller, group=None, ident=None):
+        # Group = ident nr of group
         self.controller = controller
         if ident is not None:
             self.ident = ident
@@ -192,9 +193,11 @@ class Controller:
 
         for g in groups:
             g.members = []
+
+        g_dict = dict((g.ident, g) for g in groups)
         for a in agents:
             if a.group is not None:
-                g = self.group(a.group)
+                g = g_dict[a.group]
                 if g is not None:
                     g.members.append(a)
 
