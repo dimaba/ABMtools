@@ -38,7 +38,7 @@ class Partier(ABMtools.Agent):
 ########################################################################################
 
 # One run of the model can go like this
-def setup(n=300, k=15, tolerance=70):
+def setup(n=3000, k=150, tolerance=25):
         ### Setup
         # Create the party
     c = Party(n, k, tolerance)
