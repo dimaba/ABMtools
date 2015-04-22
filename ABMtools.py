@@ -1,5 +1,15 @@
+import copy
+
+
 class Agent:
     a_ident = 0
+
+    @classmethod
+    def get_ident(cls):
+        ident = cls.a_ident
+        cls.a_ident += 1
+        return ident
+
     def __init__(self, controller, group=None, ident=None):
         # Group = ident nr of group
         self.controller = controller
@@ -8,21 +18,29 @@ class Agent:
         else:
             self.ident = self.get_ident()
         self.group = group
-        
 
     def __str__(self):
-        return "Type = Agent, Identity = {}".format(self.ident)
-        
-        
-    def get_ident(self):
-        ident = Agent.a_ident
-        Agent.a_ident += 1
-        return ident
+        return "Type = Agent, Identity = {}, Group = {}".format(self.ident, self.group)
+
+    def hatch(self):
+        # Create one new turtle in the same group which copies all attributes other than ident
+        new_agent = copy.deepcopy(self)
+        new_agent.ident = new_agent.get_ident()
+        return new_agent
         
         
 class Group:
     g_ident = 0
-    def __init__(self, controller, size=None, members=[], ident=None):
+
+    @classmethod
+    def get_ident(cls):
+        ident = cls.g_ident
+        cls.g_ident += 1
+        return ident
+
+    def __init__(self, controller, size=None, members=None, ident=None):
+        if members is None:
+            members = []
         self.controller = controller
         if ident is not None:
             self.ident = ident
@@ -31,25 +49,15 @@ class Group:
         self.size = size
         self.members = members
         
-        
     def __str__(self):
         return "Type = Group, Identity = {}, size = {}".format(self.ident, self.size)
-        
-        
+
     def str_members(self):
         return [str(m) for m in self.members]
-            
-        
-    def get_ident(self):
-        ident = Group.g_ident
-        Group.g_ident += 1
-        return ident
-        
-        
+
     def update_size(self):
         self.size = len(self.members)
-        
-        
+
     def collect_members(self, agents=None):
         if agents is None:
             agents = self.controller.agents
@@ -58,8 +66,7 @@ class Group:
             if a.group == self.ident:
                 self.members.append(a)
         self.update_size()
-        
-        
+
     def ungroup(self, kill=False, controller=None):
         # Remove all members from the group
         # Sets member group values to None if kill is False
@@ -75,8 +82,16 @@ class Group:
                 controller.kill(agent=self.members[0])
             self.members = []
         self.update_size()
-        
-        
+
+    def sprout(self, n, *args, **kwargs):
+        # Create n new agents in this group
+        agents = []
+        for _ in range(n):
+            agents.append(Agent(controller=self.controller, group=self.ident, *args, **kwargs))
+
+        self.members += agents
+        self.controller.agents += agents
+
         
 class Tie:
     pass
@@ -85,47 +100,40 @@ class Tie:
 class Controller:
     def __init__(self, agents=None, groups=None):
         if agents is None:
-            self.agents=[]
+            self.agents = []
         else:
-            self.agents=agents
+            self.agents = agents
         if groups is None:
-            self.groups=[]
+            self.groups = []
         else:
-            self.groups=groups
+            self.groups = groups
 
-    
     def create_agents(self, n=1, agenttype=Agent, agentlist='agents', *args, **kwargs):
         # Create agents of specified type (defaults to ABMtools.Agent) with the
         # possibility to pass them setup arguments
         setattr(self, agentlist, getattr(self, agentlist) + [agenttype(self, *args, **kwargs) for _ in range(n)])
-        
         
     def cra(self, *args, **kwargs):
         # Shorthand for Controller.create_agents() for lazy people who hate
         # clarity
         self.create_agents(*args, **kwargs)
         
-        
     def clear_agents(self):
         # Removes all agents
         self.agents = []
-        
         
     def ca(self):
         # Shorthand for Controller.clear_agents()
         self.clear_agents()
         
-        
     def create_groups(self, n=1, grouptype=Group, grouplist='groups', *args, **kwargs):
         # Create groups of specified type (defaults to ABMtools.Group) with the
         # possibility to pass them setup arguments
         setattr(self, grouplist, getattr(self, grouplist) + [grouptype(self, *args, **kwargs) for _ in range(n)])
-        
-        
+
     def crg(self, *args, **kwargs):
         self.create_groups(*args, **kwargs)
-    
-        
+
     def clear_groups(self, kill=False):
         # Destroy all groups. Kill determines whether all members of these
         # groups are killed or not
@@ -135,22 +143,18 @@ class Controller:
         
     def cg(self, *args, **kwargs):
         self.clear_groups(*args, **kwargs)
-        
-        
+
     def clear_ties(self):
         pass
-    
-    
+
     def cl(self):
         self.clear_ties()
-        
-    
+
     def clear_all(self):
         self.clear_groups()
         #self.clear_ties()
         self.clear_agents()
-        
-        
+
     def kill(self, ident=None, agent=None):
         # Kill one specific agent
         if agent is None and ident is not None:
@@ -159,33 +163,32 @@ class Controller:
         elif agent is None and ident is None:
             raise TypeError("Too few arguments. At least one of agent= and ident= must be specified.")
         self.agents.remove(agent)
-        
-        
+
     def agent(self, ident):
         # Returns the instance of a single agent with a given ident
-        if len([x for x in self.agents if x.ident==ident]) == 1:
-            agent = next(x for x in self.agents if x.ident==ident)
-        elif len([x for x in self.agents if x.ident==ident]) > 1:
-             raise Exception("More than one agent with ident {} found.".format(ident))
+        if len([x for x in self.agents if x.ident == ident]) == 1:
+            agent = next(x for x in self.agents if x.ident == ident)
+        elif len([x for x in self.agents if x.ident == ident]) > 1:
+            raise Exception("More than one agent with ident {} found.".format(ident))
         else:
             raise Exception("No agents with ident {} found.".format(ident))
         
         return agent
-        
-        
+
     def group(self, ident):
         # Returns the instance of a single group with a given ident
-        if len([x for x in self.groups if x.ident==ident]) == 1:
-            group = next(x for x in self.groups if x.ident==ident)
-        elif len([x for x in self.groups if x.ident==ident]) > 1:
-                 Exception("More than one group with ident {} found.".format(ident))
+        if len([x for x in self.groups if x.ident == ident]) == 1:
+            group = next(x for x in self.groups if x.ident == ident)
+        elif len([x for x in self.groups if x.ident == ident]) > 1:
+            group = None
+            Exception("More than one group with ident {} found.".format(ident))
         else:
             group = None
         
         return group
-        
 
     def census(self, agents=None, groups=None):
+        # Collect members for all groups
         if agents is None:
             agents = self.agents
         if groups is None:
@@ -207,36 +210,35 @@ class Ticker:
         self.run = run
         self.ticks = 0
         self.outfile = "result_run" + str(run) + ".txt"
+        self.header = header
         if writeheader:
             with open(self.outfile, "w") as f:
                 f.write(header + "\n")
         self.interval = interval
+        self.line = ""
         self.setline("")
-        
         
     def tick(self):
         self.ticks += 1
         if self.ticks % self.interval == 0:
             self.write()
             
-            
     def write(self):
         #print("F1", self.outfile)
         with open(self.outfile, "a") as f:
             f.write(self.line)
     
-    
     def setline(self, additions):
-        self.line = "{},{},".format(self.run,self.ticks) + additions + "\n"
+        self.line = "{},{},".format(self.run, self.ticks) + additions + "\n"
         
     def setheader(self, additions):
-        self.header = "run,tick,"+ additions + "\n" 
-        
-    
+        self.header = "run,tick," + additions + "\n"
+
     def newrun(self):
         self.run += 1
         self.ticks = 0
-            
+
+
 ##############################
     
 def max_one_of(agentset, var):
@@ -247,6 +249,7 @@ def max_one_of(agentset, var):
     maxval = max([getattr(agent, var) for agent in agentset])
     
     return next(agent for agent in agentset if getattr(agent, var) == maxval)
+
 
 def max_n_of(agentset, var, n):
     # Return list of n agents with highest values of var in agentset
@@ -282,6 +285,7 @@ def min_one_of(agentset, var):
     
     return next(agent for agent in agentset if getattr(agent, var) == minval)
 
+
 def min_n_of(agentset, var, n):
     # Return list of n agents with lowest values of var in agentset
     # Returns only the first n agents if there are more with this max value
@@ -298,9 +302,31 @@ def min_n_of(agentset, var, n):
         filler = min_n_of([agent for agent in agentset if getattr(agent, var) > minval], var, (n - len(agentswithmin)))
         
     return agentswithmin + filler
-    
+
+
 def with_min(agentset, var):
     # Returns a list of all agents with the minimum value of var in agentset
     minval = min([getattr(agent, var) for agent in agentset])
     
     return [agent for agent in agentset if getattr(agent, var) == minval]
+
+
+def other(agent, agentset):
+    # Returns same agentset but minus given agent
+    agentset.remove(agent)
+    return agentset
+
+def compile_typeset(individuals=None, iterables=None, instancetype=Agent):
+    # Take instances or groups of instances of a given type and compile them into one list
+    typeset = []
+    if individuals is not None:
+        for i in individuals:
+            if isinstance(i, instancetype):
+                typeset.append(i)
+    if iterables is not None:
+        for s in iterables:
+            for i in s:
+                if isinstance(i, instancetype):
+                    typeset.append(i)
+
+    return typeset
