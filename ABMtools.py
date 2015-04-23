@@ -163,7 +163,7 @@ class Controller:
         #self.clear_ties()
         self.clear_agents()
 
-    def kill(self, ident=None, agent=None):
+    def kill(self, agent=None,  ident=None):
         # Kill one specific agent
         if agent is None and ident is not None:
             agent = self.agent(ident)

@@ -3,11 +3,14 @@ import pickle
 import random
 
 # SETUP TEST ENVIRONMENT
-c = pickle.load(open('setup.p', 'rb'))
-ABMtools.Agent.a_ident=100000
-c.census()
-g = c.groups[0]
-a = g.members[0]
+def clean_start():
+    print('### ###  Reloading start state  ### ###')
+    cin = pickle.load(open('setup.p', 'rb'))
+    ABMtools.a_ident=100000
+    cin.census()
+    gin = cin.groups[0]
+    ain = gin.members[0]
+    return cin, gin, ain
 
 # DERIVED CLASS TEST
 class Person(ABMtools.Agent):
@@ -40,6 +43,6 @@ def test_hatch():
     print('Both are not the same object: {}'.format(a is not b))
 
 ###########################################################################
-
+c, g, a = clean_start()
 test_agent_creation()
 test_hatch()

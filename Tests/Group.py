@@ -3,11 +3,14 @@ import pickle
 import random
 
 # SETUP TEST ENVIRONMENT
-c = pickle.load(open('setup.p', 'rb'))
-ABMtools.a_ident=100000
-c.census()
-g = c.groups[0]
-na = g.members[0]
+def clean_start():
+    print('### ###  Reloading start state  ### ###')
+    cin = pickle.load(open('setup.p', 'rb'))
+    ABMtools.a_ident=100000
+    cin.census()
+    gin = cin.groups[0]
+    ain = gin.members[0]
+    return cin, gin, ain
 
 def new_test():
     print('\n')
@@ -75,18 +78,14 @@ def test_ungroup():
     print('Number of members after in g.members: {}'.format(len(g.members)))
     print('Number of members after from agentlist: {}'.format(len([i for i in c.agents if i.group == g.ident])))
     print('Number of agents after: {}'.format(len(c.agents)))
-    # Restore members
-    c.agents += gsave
-    for i in gsave:
-        i.group = g.ident
-    g.collect_members()
 
 
 def test_sprout():
     new_test()
     print('Test ABMtools.Group.sprout()')
-    print('Expected behavior: sprout() returns n agents with set group')
+    print('Expected behavior: sprout() returns N agents with set group')
     print('Agents should be appended to group.members and to controller.agents')
+    print('Tested with N=2')
     print("Length of g.members before: {}".format(len(g.members)))
     print("Length of c.agents before: {}".format(len(c.agents)))
     print("Last group member before: {}".format(g.members[-1]))
@@ -98,7 +97,9 @@ def test_sprout():
 
 
 ###########################################################################
+c, g, a = clean_start()
 test_group_creation()
 test_collect_members()
 test_ungroup()
+c, g, a = clean_start()
 test_sprout()

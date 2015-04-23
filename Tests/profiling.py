@@ -33,6 +33,18 @@ def profile_hatch():
     p = pstats.Stats('Profiles/Agent_hatch')
     p.strip_dirs().sort_stats('cumulative').print_stats()
 
+
+def test_kill():
+    a = random.choice(c.agents)
+    c.kill(agent=a)
+
+
+def profile_kill():
+    cProfile.run('test_kill()', 'Profiles/Controller_kill')
+    p = pstats.Stats('Profiles/Controller_kill')
+    p.strip_dirs().sort_stats('cumulative').print_stats()
+
+
 ###########################################################################
 
-profile_hatch()
+profile_kill()

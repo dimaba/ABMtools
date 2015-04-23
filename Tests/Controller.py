@@ -3,11 +3,14 @@ import pickle
 import random
 
 # SETUP TEST ENVIRONMENT
-c = pickle.load(open('setup.p', 'rb'))
-ABMtools.a_ident=100000
-c.census()
-g = c.groups[0]
-a = g.members[0]
+def clean_start():
+    print('### ###  Reloading start state  ### ###')
+    cin = pickle.load(open('setup.p', 'rb'))
+    ABMtools.a_ident=100000
+    cin.census()
+    gin = cin.groups[0]
+    ain = gin.members[0]
+    return cin, gin, ain
 
 def new_test():
     print('\n')
@@ -49,5 +52,50 @@ def test_create_agents():
     print("Number of agents: {}".format(len(c.agents)))
     print("Latest agent: {}".format(c.agents[-1]))
 
+
+def test_clear_groups():
+    new_test()
+    print('Testing ABMtools.Controller.clear_agents() without kill')
+    print('Expected behavior: All groups are without members. All agents get group set to None')
+    print('Equal number of agents in list before and after')
+    print('Agents in list before: {}'.format(len(c.agents)))
+    print('All groups have 0 members before? {}'.format(all([x.size == 0 for x in c.groups])))
+    print('All agents have group set to None before? {}'.format(all(i.group is None for i in c.agents)))
+    c.clear_groups()
+    print('Agents in list after: {}'.format(len(c.agents)))
+    print('All groups have 0 members after? {}'.format(all([x.size == 0 for x in c.groups])))
+    print('All agents have group set to None after? {}'.format(all(i.group is None for i in c.agents)))
+    ct, gt, at = clean_start()
+    print('Testing ABMtools.Controller.clear_agents() with kill')
+    print('Expected behavior: All groups are without members. All agents get group set to None')
+    print('Agent list is empty after')
+    print('Agents in list before: {}'.format(len(c.agents)))
+    print('All groups have 0 members before? {}'.format(all([x.size == 0 for x in ct.groups])))
+    print('All agents have group set to None before? {}'.format(all(i.group is None for i in ct.agents)))
+    ct.clear_groups(kill=True)
+    print('Agents in list after: {}'.format(len(ct.agents)))
+    print('All groups have 0 members after? {}'.format(all([x.size == 0 for x in ct.groups])))
+    print('All agents have group set to None after? {}'.format(all(i.group is None for i in ct.agents)))
+
+
+def test_kill():
+    print('Testing ABMtools.Controller.kill() by passing agent')
+    print('Expected behavior: Agent is removed from agent list, agent has group set to None')
+    print('Agent is removed from group member list')
+    print('Agent to kill: {}'.format(a))
+    print('Agent to kill is in agent list before? {}'.format(a in c.agents))
+    print('Agent group before: {}'.format(a.group))
+    print('Agent is in group member list before? {}'.format(a in c.group(a.group).members))
+    aident = a.ident
+    aoldgroup = a.group
+    c.kill(a)
+    print('Agent is in agent list after? {}'.format(aident in [i.ident for i in c.agents]))
+    print('Agent is in group member list after? {}'.format(aident in [i.ident for i in c.group(aoldgroup).members]))
+
 ###########################################################################
+c, g, a = clean_start()
 test_create_agents()
+c, g, a = clean_start()
+test_clear_groups()
+c, g, a = clean_start()
+test_kill()

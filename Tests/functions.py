@@ -2,10 +2,14 @@ import ABMtools
 import pickle
 
 # SETUP TEST ENVIRONMENT
-c = pickle.load(open('setup.p', 'rb'))
-c.census()
-g = c.groups[0]
-a = g.members[0]
+def clean_start():
+    print('### ###  Reloading start state  ### ###')
+    cin = pickle.load(open('setup.p', 'rb'))
+    ABMtools.a_ident=100000
+    cin.census()
+    gin = cin.groups[0]
+    ain = gin.members[0]
+    return cin, gin, ain
 
 def new_test():
     print('\n')
@@ -48,5 +52,6 @@ def test_compile_typeset():
     print('First member group: {}'.format(returnset[0]))
 
 ###########################################################################
+c, g, a = clean_start()
 test_others()
 test_compile_typeset()
