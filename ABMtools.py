@@ -145,9 +145,14 @@ class Controller:
     def clear_groups(self, kill=False):
         # Destroy all groups. Kill determines whether all members of these
         # groups are killed or not
+        for agent in self.agents:
+            agent.group = None
         for group in self.groups:
-            group.ungroup(kill, self)
+            group.members = []
+            group.update_size()
         self.groups = []
+        if kill:
+            self.agents = []
         
     def cg(self, *args, **kwargs):
         self.clear_groups(*args, **kwargs)

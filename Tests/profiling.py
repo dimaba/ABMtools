@@ -4,8 +4,14 @@ import cProfile
 import pstats
 import pickle
 
-c = pickle.load(open('setup.p', 'rb'))
-print(c)
+def clean_start():
+    print('### ###  Reloading start state  ### ###')
+    cin = pickle.load(open('setup.p', 'rb'))
+    ABMtools.a_ident=100000
+    cin.census()
+    gin = cin.groups[0]
+    ain = gin.members[0]
+    return cin, gin, ain
 
 
 def new_test():
@@ -40,11 +46,33 @@ def test_kill():
 
 
 def profile_kill():
+    new_test()
     cProfile.run('test_kill()', 'Profiles/Controller_kill')
     p = pstats.Stats('Profiles/Controller_kill')
     p.strip_dirs().sort_stats('cumulative').print_stats()
 
 
-###########################################################################
+def test_clear_groups(kill=True):
+    print('Testing ABMtools.Controller.clear_agents() with kill')
+    print('Expected behavior: All groups are without members. All agents get group set to None')
+    print('Agent list is empty after')
+    print('Agents in list before: {}'.format(len(c.agents)))
+    print('All groups have 0 members before? {}'.format(all([x.size == 0 for x in c.groups])))
+    print('All agents have group set to None before? {}'.format(all(i.group is None for i in c.agents)))
+    ab = c.agents
+    c.clear_groups(kill=kill)
+    print('Agents in list after: {}'.format(len(c.agents)))
+    print('All groups have 0 members after? {}'.format(all([x.size == 0 for x in c.groups])))
+    print('All agents have group set to None after? {}'.format(all(i.group is None for i in ab)))
 
-profile_kill()
+
+def profile_clear_group():
+    new_test()
+    cProfile.run('test_clear_groups()', 'Profiles/Controller_clear_groups')
+    p = pstats.Stats('Profiles/Controller_clear_groups')
+    p.strip_dirs().sort_stats('cumulative').print_stats()
+
+
+###########################################################################
+c, g, a = clean_start()
+profile_clear_group()
