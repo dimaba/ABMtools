@@ -85,9 +85,9 @@ class Group:
             self.members = []
         else:
             while len(self.members) > 0:
-                self.members[0].group = None
-                controller.kill(agent=self.members[0])
-                self.members.pop(0)
+                a = self.members[0]
+                controller.kill(a)
+                a.group = None
             self.members = []
         self.update_size()
 
