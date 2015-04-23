@@ -1,13 +1,12 @@
 import copy
-
+a_ident = 0
+g_ident = 0
 
 class Agent:
-    a_ident = 0
-
-    @classmethod
-    def get_ident(cls):
-        ident = cls.a_ident
-        cls.a_ident += 1
+    @staticmethod
+    def get_ident():
+        ident = a_ident
+        a_ident += 1
         return ident
 
     def __init__(self, controller, group=None, ident=None):
@@ -24,7 +23,7 @@ class Agent:
 
     def hatch(self):
         # Create one new turtle in the same group which copies all attributes other than ident
-        new_agent = copy.deepcopy(self)
+        new_agent = copy.copy(self)
         new_agent.ident = new_agent.get_ident()
         return new_agent
         
@@ -58,6 +57,12 @@ class Group:
     def update_size(self):
         self.size = len(self.members)
 
+    def increment_size(self):
+        self.size += 1
+
+    def decrement_size(self):
+        self.size -= 1
+
     def collect_members(self, agents=None):
         if agents is None:
             agents = self.controller.agents
@@ -79,7 +84,9 @@ class Group:
             self.members = []
         else:
             while len(self.members) > 0:
+                self.members[0].group = None
                 controller.kill(agent=self.members[0])
+                self.members.pop(0)
             self.members = []
         self.update_size()
 
