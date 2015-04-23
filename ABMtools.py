@@ -5,6 +5,7 @@ g_ident = 0
 class Agent:
     @staticmethod
     def get_ident():
+        global a_ident
         ident = a_ident
         a_ident += 1
         return ident
@@ -29,12 +30,12 @@ class Agent:
         
         
 class Group:
-    g_ident = 0
 
-    @classmethod
-    def get_ident(cls):
-        ident = cls.g_ident
-        cls.g_ident += 1
+    @staticmethod
+    def get_ident():
+        global g_ident
+        ident = g_ident
+        g_ident += 1
         return ident
 
     def __init__(self, controller, size=None, members=None, ident=None):

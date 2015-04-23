@@ -4,7 +4,7 @@ import random
 
 # SETUP TEST ENVIRONMENT
 c = pickle.load(open('setup.p', 'rb'))
-ABMtools.Agent.a_ident=100000
+ABMtools.a_ident=100000
 c.census()
 g = c.groups[0]
 na = g.members[0]
