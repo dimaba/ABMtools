@@ -175,6 +175,9 @@ class Controller:
                 
         elif agent is None and ident is None:
             raise TypeError("Too few arguments. At least one of agent= and ident= must be specified.")
+
+        self.group(agent.group).members.remove(agent)
+        agent.group = None
         self.agents.remove(agent)
 
     def agent(self, ident):

@@ -1,3 +1,6 @@
+import os
+parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.sys.path.insert(0,parentdir)
 import ABMtools
 import pickle
 import random
@@ -79,6 +82,7 @@ def test_clear_groups():
 
 
 def test_kill():
+    new_test()
     print('Testing ABMtools.Controller.kill() by passing agent')
     print('Expected behavior: Agent is removed from agent list, agent has group set to None')
     print('Agent is removed from group member list')
