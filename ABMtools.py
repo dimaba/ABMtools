@@ -219,6 +219,9 @@ class Controller:
                 g = g_dict[a.group]
                 if g is not None:
                     g.members.append(a)
+                    
+        for g in groups:
+            g.update_size()
 
 
 class Ticker:
