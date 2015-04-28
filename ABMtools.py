@@ -185,9 +185,9 @@ class Controller:
         if len([x for x in self.agents if x.ident == ident]) == 1:
             agent = next(x for x in self.agents if x.ident == ident)
         elif len([x for x in self.agents if x.ident == ident]) > 1:
-            raise Exception("More than one agent with ident {} found.".format(ident))
+            raise KeyError("More than one agent with ident {} found.".format(ident))
         else:
-            raise Exception("No agents with ident {} found.".format(ident))
+            raise KeyError("No agents with ident {} found.".format(ident))
         
         return agent
 
@@ -197,9 +197,10 @@ class Controller:
             group = next(x for x in self.groups if x.ident == ident)
         elif len([x for x in self.groups if x.ident == ident]) > 1:
             group = None
-            Exception("More than one group with ident {} found.".format(ident))
+            raise KeyError("More than one group with ident {} found.".format(ident))
         else:
             group = None
+            raise KeyError("No groups with ident {} found.".format(ident))
         
         return group
 
@@ -225,33 +226,42 @@ class Controller:
 
 
 class Ticker:
-    def __init__(self, interval=1, run=1, header="run,tick", writeheader=True):
+    # The ticker stores summary variables across periods, handles any functions that need to be called in each step of
+    # the model
+    # REMOVED THE WRITING TO FILE STUFF FOR NOW, WILL ADD THAT IN SYSTEMATICALLY LATER
+    # SETUP FUNCTION MUST RETURN A CONTROLLER OBJECT
+    def __init__(self, interval=1, run=1):
         self.run = run
         self.ticks = 0
-        self.outfile = "result_run" + str(run) + ".txt"
-        self.header = header
-        if writeheader:
-            with open(self.outfile, "w") as f:
-                f.write(header + "\n")
         self.interval = interval
-        self.line = ""
-        self.setline("")
-        
+        self.setup_func = None
+        self.step_func = None
+
+    def set_setup(self, func, *args, **kwargs):
+        self.setup_func = (func, args, kwargs)
+
+    def setup(self):
+        func = self.setup_func[0]
+        args = self.setup_func[1]
+        kwargs = self.setup_func[2]
+        c = func(*args, **kwargs)
+        return c
+        # AT THIS POINT INITIAL VALUES SHOULD BE WRITTEN TO FILE IF NECESSARY
+
+    def set_step(self, func, *args, **kwargs):
+        self.step_func = (func, args, kwargs)
+
+    def step(self):
+        func = self.step_func[0]
+        args = self.step_func[1]
+        kwargs = self.step_func[2]
+        func(*args, **kwargs)
+        # IF CURRENT TICK NUMBER MATCHES THE INTERVAL THIS FUNCTION SHOULD TRIGGER WRITING TO FILE
+
     def tick(self):
         self.ticks += 1
         if self.ticks % self.interval == 0:
             self.write()
-            
-    def write(self):
-        #print("F1", self.outfile)
-        with open(self.outfile, "a") as f:
-            f.write(self.line)
-    
-    def setline(self, additions):
-        self.line = "{},{},".format(self.run, self.ticks) + additions + "\n"
-        
-    def setheader(self, additions):
-        self.header = "run,tick," + additions + "\n"
 
     def newrun(self):
         self.run += 1

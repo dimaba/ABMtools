@@ -3,6 +3,7 @@ parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0,parentdir)
 import ABMtools
 import pickle
+import pytest
 import random
 
 # SETUP TEST ENVIRONMENT
@@ -110,7 +111,82 @@ def test_kill():
     print('Agent is in agent list after? {}'.format(aident in [i.ident for i in c.agents]))
     print('Agent is in group member list after? {}'.format(aident in [i.ident for i in c.group(aoldgroup).members]))
     assert (aident not in [i.ident for i in c.agents]) and (aident not in [i.ident for i in c.group(aoldgroup).members])
+
+
+def test_agent():
+    new_test()
+    c, g, a = clean_start()
+    print('Testing ABMtools.Controller.agent() with an ident which corresponds to exactly one agent')
+    print('Expected behavior: Returns agent instance with specified ident')
+    print('Ident to find: {}, Agents with this ident: {}'.format(5000, len([x for x in c.agents if x.ident == 5000])))
+    print('Corresponding agent: {}'.format(next(x for x in c.agents if x.ident == 5000)))
+    print('Agent found: {}'.format(c.agent(5000)))
+    print('Testing ABMtools.Controller.agent() with an ident for which no corresponding agent exists')
+    print('Expected behavior: Raises KeyError')
+    c.kill(ident=5000)
+    print('Ident to find: {}, Agents with this ident: {}'.format(5000, len([x for x in c.agents if x.ident == 5000])))
+    with pytest.raises(KeyError) as excinfo:
+        c.agent(5000)
+    print('Exception raised: "{}: {}"'.format(excinfo.type, excinfo.value))
+    print('Testing ABMtools.Controller.agent() with an ident for which more than one corresponding agent exists')
+    print('Expected behavior: Raises KeyError')
+    c.create_agents(2, ident=5000)
+    print('Ident to find: {}, Agents with this ident: {}'.format(5000, len([x for x in c.agents if x.ident == 5000])))
+    with pytest.raises(KeyError) as excinfo:
+        c.agent(5000)
+    print('Exception raised: "{}: {}"'.format(excinfo.type, excinfo.value))
+
+
+def test_group():
+    new_test()
+    c, g, a = clean_start()
+    print('Testing ABMtools.Controller.group() with an ident which corresponds to exactly one group')
+    print('Expected behavior: Returns agent instance with specified agent')
+    print('Ident to find: {}, Groups with this ident: {}'.format(500, len([x for x in c.groups if x.ident == 500])))
+    print('Corresponding group: {}'.format(next(x for x in c.groups if x.ident == 500)))
+    print('Group found: {}'.format(c.group(500)))
+    print('Testing ABMtools.Controller.group() with an ident for which no corresponding group exists')
+    print('Expected behavior: Raises KeyError')
+    c.groups.remove(next(x for x in c.groups if x.ident == 500))
+    print('Ident to find: {}, Groups with this ident: {}'.format(500, len([x for x in c.groups if x.ident == 500])))
+    with pytest.raises(KeyError) as excinfo:
+        c.group(500)
+    print('Exception raised: "{}: {}"'.format(excinfo.type, excinfo.value))
+    print('Testing ABMtools.Controller.group() with an ident for which more than one corresponding group exists')
+    print('Expected behavior: Raises KeyError')
+    c.create_groups(2, ident=500)
+    print('Ident to find: {}, Groups with this ident: {}'.format(500, len([x for x in c.groups if x.ident == 500])))
+    with pytest.raises(KeyError) as excinfo:
+        c.group(500)
+    print('Exception raised: "{}: {}"'.format(excinfo.type, excinfo.value))
+
+
+def test_census():
+    new_test()
+    c = ABMtools.Controller()
+    print('Testing ABMtools.Controller.census()')
+    print('Expected behavior: all agents are in their respective groups, all groups are complete')
+    ABMtools.a_ident, ABMtools.g_ident = 0,0
+    c.create_groups(10)
+    print('Create 10 groups: {}'.format([x.ident for x in c.groups]))
+    for i in range(10):
+        c.create_agents(10, group=i)
+    rd = {i: len([a for a in c.agents if a.group == i]) for i in range(10)}
+    print('Create 100 agents, 10 per group: {}'.format(rd))
+    print('Length of group member lists before census: {}'.format([len(x.members) for x in c.groups]))
+    print('Reported group sizes as group property before census: {}'.format([x.size for x in c.groups]))
+    c.census()
+    print('Length of group member lists after census: {}'.format([len(x.members) for x in c.groups]))
+    print('Reported group sizes as group property after census: {}'.format([x.size for x in c.groups]))
+    print('Are all agents present in the member lists of their corresponding group? {}'.format(all([a in c.group(a.group).members for a in c.agents])))
+    assert(all([x.size == 10 for x in c.groups]) and all([len(x.members) == 10 for x in c.groups]))
+    assert(all([a in c.group(a.group).members for a in c.agents]))
+
+
 ###########################################################################
 test_create_agents()
 test_clear_groups()
 test_kill()
+test_agent()
+test_group()
+test_census()

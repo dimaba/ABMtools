@@ -90,6 +90,7 @@ def step(c, i):
     #print("Step {}".format(i))
     #print("Boring groups: {}".format(c.boringgroups))
 
-c = setup()
-for i in range(200):
-    step(c, i)
+if __name__ == '__main__':
+    c = setup()
+    for i in range(200):
+        step(c, i)
