@@ -9,7 +9,7 @@ import ABMtools
 
 class Controller(ABMtools.Controller):
     def __init__(self, decayrate, efficiency, exit_chance, reporters):
-        ABMtools.Controller.__init__():
+        ABMtools.Controller.__init__()
         self.decayrate = decayrate
         self.efficiency = efficiency
         self.exit_chance = exit_chance

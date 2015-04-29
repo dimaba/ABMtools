@@ -23,6 +23,8 @@ def partymodel_start():
     tin = ABMtools.Ticker()
     tin.set_setup(partymodel.setup, n=70, k=10, tolerance=25)
     cin = tin.setup()
+    cin.setupvars = OrderedDict([("n", "Nr.Initial.Agents"), ("k", "Nr.Initial.Groups"), ("tolerance", "Tolerance level")])
+    cin.reporters = OrderedDict([("len(self.agents)", "Nr.Agents"), ("self.boringgroups", "Nr.BoringGroups")])
     return tin, cin
 
 def new_test():
@@ -66,8 +68,25 @@ def test_header():
     print(t.header())
 
 def test_report():
-    pass
+    new_test()
+    t, c = partymodel_start()
+    print("Test ABMtools.Ticker.report()")
+    print("Expected behavior: writes values of all reporters")
+    c.reporters = OrderedDict([("n_agents", "Nr.Agents"), ("boringgroups", "Nr.BoringGroups")])
+    print("Selected reporters: {}".format(c.reporters))
+    print("Values of reporters for first 3 steps: ")
+    t.set_step(partymodel.step, c, t.ticks)
+    rep0 = t.report()
+    t.step()
+    rep1 = t.report()
+    t.step()
+    rep2 = t.report()
+    t.step()
+    rep3 = t.report()
+    print("0: {}1: {}2: {}3: {}".format(rep0, rep1, rep2, rep3))
+
 
 ###########################################################################
 test_define_setup()
 test_header()
+test_report()
