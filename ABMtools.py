@@ -106,7 +106,7 @@ class Tie:
 
     
 class Controller:
-    def __init__(self, agents=None, groups=None):
+    def __init__(self, agents=None, groups=None, reporters=None, setupvars=None):
         if agents is None:
             self.agents = []
         else:
@@ -115,6 +115,14 @@ class Controller:
             self.groups = []
         else:
             self.groups = groups
+        if reporters is None:
+            self.reporters = []
+        else:
+            self.reporters = reporters
+        if setupvars is None:
+            self.setupvars = []
+        else:
+            self.setupvars = setupvars
 
     def create_agents(self, n=1, agenttype=Agent, agentlist='agents', *args, **kwargs):
         # Create agents of specified type (defaults to ABMtools.Agent) with the
@@ -230,23 +238,34 @@ class Ticker:
     # the model
     # REMOVED THE WRITING TO FILE STUFF FOR NOW, WILL ADD THAT IN SYSTEMATICALLY LATER
     # SETUP FUNCTION MUST RETURN A CONTROLLER OBJECT
-    def __init__(self, interval=1, run=1):
+    def __init__(self, controller=None, interval=1, run=1):
         self.run = run
         self.ticks = 0
         self.interval = interval
         self.setup_func = None
         self.step_func = None
+        self.controller = controller
 
     def set_setup(self, func, *args, **kwargs):
         self.setup_func = (func, args, kwargs)
 
-    def setup(self):
+    def setup(self, set_controller=True):
         func = self.setup_func[0]
         args = self.setup_func[1]
         kwargs = self.setup_func[2]
         c = func(*args, **kwargs)
+        if set_controller:
+            self.controller = c
         return c
         # AT THIS POINT INITIAL VALUES SHOULD BE WRITTEN TO FILE IF NECESSARY
+
+    def header(self):
+        # PLACEHOLDER
+        header = ""
+        setupattr = [getattr(self.controller, var) for var in self.controller.setupvars.keys()]
+        for varname, value in zip(self.controller.setupvars.values(), setupattr):
+            print("{} = {}".format(varname, value))
+        return ",".join(self.controller.reporters.values())
 
     def set_step(self, func, *args, **kwargs):
         self.step_func = (func, args, kwargs)
@@ -257,6 +276,11 @@ class Ticker:
         kwargs = self.step_func[2]
         func(*args, **kwargs)
         # IF CURRENT TICK NUMBER MATCHES THE INTERVAL THIS FUNCTION SHOULD TRIGGER WRITING TO FILE
+
+    def report(self):
+        # PLACEHOLDER
+        reporter_values = [getattr(self.controller, var) for var in self.controller.reporters.keys()]
+        print("{}".format(reporter_values))
 
     def tick(self):
         self.ticks += 1
