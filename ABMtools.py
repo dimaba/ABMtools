@@ -1,3 +1,4 @@
+import collections
 import copy
 a_ident = 0
 g_ident = 0
@@ -160,18 +161,25 @@ class Controller:
         else:
             self.groups = groups
         if reporters is None:
-            self.reporters = []
+            self.reporters = collections.OrderedDict()
         else:
             self.reporters = reporters
         if setupvars is None:
-            self.setupvars = []
+            self.setupvars = collections.OrderedDict()
         else:
             self.setupvars = setupvars
+        self.n_agents = len(self.agents)
+        self.n_groups = len(self.groups)
+
+    def update_counts(self):
+        self.n_agents = len(self.agents)
+        self.n_groups = len(self.groups)
 
     def create_agents(self, n=1, agenttype=Agent, agentlist='agents', *args, **kwargs):
         # Create agents of specified type (defaults to ABMtools.Agent) with the
         # possibility to pass them setup arguments
         setattr(self, agentlist, getattr(self, agentlist) + [agenttype(self, *args, **kwargs) for _ in range(n)])
+        self.update_counts()
         
     def cra(self, *args, **kwargs):
         # Shorthand for Controller.create_agents() for lazy people who hate
@@ -181,6 +189,7 @@ class Controller:
     def clear_agents(self):
         # Removes all agents
         self.agents = []
+        self.update_counts()
         
     def ca(self):
         # Shorthand for Controller.clear_agents()
@@ -190,6 +199,7 @@ class Controller:
         # Create groups of specified type (defaults to ABMtools.Group) with the
         # possibility to pass them setup arguments
         setattr(self, grouplist, getattr(self, grouplist) + [grouptype(self, *args, **kwargs) for _ in range(n)])
+        self.update_counts()
 
     def crg(self, *args, **kwargs):
         self.create_groups(*args, **kwargs)
@@ -205,6 +215,7 @@ class Controller:
         self.groups = []
         if kill:
             self.agents = []
+        self.update_counts()
         
     def cg(self, *args, **kwargs):
         self.clear_groups(*args, **kwargs)
@@ -231,6 +242,7 @@ class Controller:
         self.group(agent.group).members.remove(agent)
         agent.group = None
         self.agents.remove(agent)
+        self.update_counts()
 
     def agent(self, ident):
         # Returns the instance of a single agent with a given ident
@@ -282,13 +294,14 @@ class Ticker:
     # the model
     # REMOVED THE WRITING TO FILE STUFF FOR NOW, WILL ADD THAT IN SYSTEMATICALLY LATER
     # SETUP FUNCTION MUST RETURN A CONTROLLER OBJECT
-    def __init__(self, controller=None, interval=1, run=1):
+    def __init__(self, controller=None, interval=1, run=1, outfile="Results/run.txt"):
         self.run = run
         self.ticks = 0
         self.interval = interval
         self.setup_func = None
         self.step_func = None
         self.controller = controller
+        self.outfile = outfile
 
     def set_setup(self, func, *args, **kwargs):
         self.setup_func = (func, args, kwargs)
@@ -301,30 +314,34 @@ class Ticker:
         if set_controller:
             self.controller = c
         return c
-        # AT THIS POINT INITIAL VALUES SHOULD BE WRITTEN TO FILE IF NECESSARY
 
     def header(self):
         # PLACEHOLDER
         header = ""
         setupattr = [getattr(self.controller, var) for var in self.controller.setupvars.keys()]
         for varname, value in zip(self.controller.setupvars.values(), setupattr):
-            print("{} = {}".format(varname, value))
-        return ",".join(self.controller.reporters.values())
+            header += ("{} = {}\n".format(varname, value))
+        header += ",".join(self.controller.reporters.values()) + "\n"
+        return header
 
     def set_step(self, func, *args, **kwargs):
         self.step_func = (func, args, kwargs)
 
-    def step(self):
+    def step(self, write=True):
         func = self.step_func[0]
         args = self.step_func[1]
         kwargs = self.step_func[2]
         func(*args, **kwargs)
+        if write and self.ticks == 0:
+            self.write_to_file(self.header(), method='w')
+        if write and self.ticks % self.interval in (0, 1):
+            self.write_to_file(self.report())
+        self.ticks += 1
         # IF CURRENT TICK NUMBER MATCHES THE INTERVAL THIS FUNCTION SHOULD TRIGGER WRITING TO FILE
 
     def report(self):
-        # PLACEHOLDER
-        reporter_values = [getattr(self.controller, var) for var in self.controller.reporters.keys()]
-        print("{}".format(reporter_values))
+        reporter_values = [str(getattr(self.controller, var)) for var in self.controller.reporters.keys()]
+        return ",".join(reporter_values) + "\n"
 
     def tick(self):
         self.ticks += 1
@@ -334,6 +351,15 @@ class Ticker:
     def newrun(self):
         self.run += 1
         self.ticks = 0
+
+    def write_to_file(self, line, method='a', file=None, file_open=False):
+        if file is None:
+            file = self.outfile
+        if file_open:
+            file.write(line)
+        else:
+            with open(file, method) as f:
+                f.write(line)
 
 
 ##############################
