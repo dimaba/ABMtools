@@ -248,7 +248,8 @@ class Controller:
     def move(self, agent, target_group=None, target_group_ident=None):
         """
         Move an agent from its current group to another. Both the group object and the group ident can be used
-        to identify the target group. If both are given the group object is used.
+        to identify the target group. If both are given the group object is used. If neither are given the agent
+        is moved to group None (i.e. out of the existing group but not to a new one)
         Updates size of original and
         target group.
         :param agent: agent to be moved
@@ -256,20 +257,24 @@ class Controller:
         :param target_group_ident: ident of group to move agent to
         :return:
         """
+        # Get target group from ident if only ident is given
         if target_group is None and target_group_ident is not None:
             target_group = self.group(target_group_ident)
-        elif target_group is None and target_group_ident is None:
-            raise TypeError("Not enough arguments. At least one of target_group= and target_group_ident= must be specified.")
 
+        # Remove from original group if agent was in one
         original_group_ident = agent.group
         if original_group_ident is not None:
             original_group = self.group(original_group_ident)
             original_group.members.remove(agent)
             original_group.decrement_size()
 
-        agent.group = target_group.ident
-        target_group.members.append(agent)
-        target_group.increment_size()
+        # Move to new group if specified, else move out of all groups
+        if target_group is not None:
+            agent.group = target_group.ident
+            target_group.members.append(agent)
+            target_group.increment_size()
+        else:
+            agent.group = None
 
 
     def agent(self, ident):
