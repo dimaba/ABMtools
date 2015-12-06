@@ -4,8 +4,21 @@ a_ident = 0
 g_ident = 0
 
 class Agent:
+    """Create an agent.
+
+    This class is meant to be extended with methods specific to the ABM.
+    Example: if agents in the ABM should evaluate their happiness given certain conditions,
+    you would want to extend this class with a 'happiness' attribute and a method to update it.
+
+    Attributes:
+    controller (ABMtools.Controller): Controller to manage this Agent
+    ident (int): Agent's unique identification number
+    group (int): Number of the group this Agent belongs to
+
+    """
     @staticmethod
     def get_ident():
+        """ Get current global agent ident from ABMtools module and return it."""
         global a_ident
         ident = a_ident
         a_ident += 1
@@ -24,16 +37,28 @@ class Agent:
         return "Type = Agent, Identity = {}, Group = {}".format(self.ident, self.group)
 
     def hatch(self):
-        # Create one new turtle in the same group which copies all attributes other than ident
+        """ Create one new agent in the same group which copies all attributes other than ident."""
         new_agent = copy.copy(self)
         new_agent.ident = new_agent.get_ident()
         return new_agent
         
         
 class Group:
+    """Create a group.
 
+    This class is meant to be extended with methods specific to the ABM.
+    Example: if a group in the ABM should levy a tax on its members you would want to
+    extend this class with a 'tax_level' attribute and a method to collect taxes.
+
+    Attributes:
+    controller (ABMtools.Controller): Controller to manage this Group
+    ident (int): Group's unique identification number
+    size (int): Number of members in the Group
+    members (list of ABMtools.Agent or subclasses): All agents which are a member of this group
+    """
     @staticmethod
     def get_ident():
+        """ Get current global group ident from ABMtools module and return it."""
         global g_ident
         ident = g_ident
         g_ident += 1
@@ -54,18 +79,31 @@ class Group:
         return "Type = Group, Identity = {}, size = {}".format(self.ident, self.size)
 
     def str_members(self):
+        """Return string representation of all members of this Group."""
         return [str(m) for m in self.members]
 
     def update_size(self):
+        """Update Group.size with the number of current members."""
         self.size = len(self.members)
 
     def increment_size(self):
+        """Add one to Group.size."""
         self.size += 1
 
     def decrement_size(self):
+        """Remove one from Group.size."""
         self.size -= 1
 
     def collect_members(self, agents=None):
+        """Add all members to Group.members list.
+
+        Args:
+        agents=None (list of ABMtools.Agent or subclasses): List of agents from which to collect members
+
+        Loop through provided list of agents (or through Group's controller's list of agents if no list provided) and
+        add all agents whose Agent.group matches this Group's ident to this Group's member list. Then update size of
+        the member list.
+        """
         if agents is None:
             agents = self.controller.agents
         self.members = []
@@ -75,6 +113,12 @@ class Group:
         self.update_size()
 
     def ungroup(self, kill=False, controller=None):
+        """Remove all members from the group.
+
+        Args:
+        kill=False (Bool): Should agents in the group also be killed? True -> Yes, False -> No
+        controller=None (AB
+        """
         # Remove all members from the group
         # Sets member group values to None if kill is False
         # Destroys group members if kill is True
