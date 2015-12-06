@@ -322,7 +322,7 @@ class Ticker:
         setupattr = [getattr(self.controller, var) for var in self.controller.setupvars.keys()]
         for varname, value in zip(self.controller.setupvars.values(), setupattr):
             header += ("{} = {}\n".format(varname, value))
-        header += ",".join([str(v) for v in self.controller.reporters.values()]) + "\n"
+        header += ",".join([str(k) for k in self.controller.reporters.keys()]) + "\n"
         return header
 
     def set_step(self, func, *args, **kwargs):
@@ -336,7 +336,7 @@ class Ticker:
         if write and self.ticks == 0:
             self.write_to_file(self.header(), method='w')
         if write and self.ticks % self.interval in (0, 1):
-            self.write_to_file(self.report())
+            self.write_to_file(self.report(), method='a')
         self.ticks += 1
         # IF CURRENT TICK NUMBER MATCHES THE INTERVAL THIS FUNCTION SHOULD TRIGGER WRITING TO FILE
 
