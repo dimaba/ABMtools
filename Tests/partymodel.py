@@ -48,7 +48,7 @@ def setup(n=70, k=10, tolerance=25):
         # Populate the party
     c.create_groups(c.k)
     for _ in range(n):
-        c.create_agents(1, Partier, sex=random.choice(["M","F"]), group=random.choice([i.ident for i in c.groups]))
+        c.create_agents(1, Partier, sex=random.choice(["M","F"]), group=random.choice([i for i in c.groups]))
 
         # Collect partygoers into groups
     c.census()
@@ -92,5 +92,5 @@ def step(c, i):
 
 if __name__ == '__main__':
     c = setup()
-    for i in range(200):
+    for i in range(2000):
         step(c, i)

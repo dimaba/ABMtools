@@ -477,8 +477,11 @@ def with_min(agentset, var):
 
 
 def other(instance, instanceset):
-    # Returns same instanceset but minus given agent
-    instanceset.remove(instance)
+    # Returns same instanceset but minus given agent/group
+    # To prevent removing groups or agents from the controller master list, the instanceset returned
+    # is a copy minus given agent/group, not the parameter minus given agent/group
+    new_instanceset = copy.copy(instanceset)
+    new_instanceset.remove(instance)
     return instanceset
 
 def compile_typeset(individuals=None, iterables=None, instancetype=Agent):
