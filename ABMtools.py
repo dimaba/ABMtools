@@ -149,7 +149,7 @@ class Group:
 class Tie:
     pass
 
-    
+
 class Controller:
     def __init__(self, agents=None, groups=None, reporters=None, setupvars=None):
         if agents is None:
@@ -245,7 +245,32 @@ class Controller:
         self.agents.remove(agent)
         self.update_counts()
 
-    # TODO: Add move() to move agent from one group to another
+    def move(self, agent, target_group=None, target_group_ident=None):
+        """
+        Move an agent from its current group to another. Both the group object and the group ident can be used
+        to identify the target group. If both are given the group object is used.
+        Updates size of original and
+        target group.
+        :param agent: agent to be moved
+        :param target_group: group object to move agent to
+        :param target_group_ident: ident of group to move agent to
+        :return:
+        """
+        if target_group is None and target_group_ident is not None:
+            target_group = self.group(target_group_ident)
+        elif target_group is None and target_group_ident is None:
+            raise TypeError("Not enough arguments. At least one of target_group= and target_group_ident= must be specified.")
+
+        original_group_ident = agent.group
+        if original_group_ident is not None:
+            original_group = self.group(original_group_ident)
+            original_group.members.remove(agent)
+            original_group.decrement_size()
+
+        agent.group = target_group.ident
+        target_group.members.append(agent)
+        target_group.increment_size()
+
 
     def agent(self, ident):
         # Returns the instance of a single agent with a given ident
