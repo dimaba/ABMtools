@@ -85,9 +85,9 @@ def step(c):
 
     exiters = [a for a in c.agents if a.exit]
     for a in exiters:
-        alternatives = [g for g in c.groups if g.ident != a.group]
+        alternatives = [g for g in c.groups if g is not a.group]
         new = random.choice(alternatives)
-        a.group = new.ident
+        a.group = new
 
     c.census()
 

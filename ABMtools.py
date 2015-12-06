@@ -25,7 +25,7 @@ class Agent:
         return ident
 
     def __init__(self, controller, group=None, ident=None):
-        # Group = ident nr of group
+        # Group = group object
         self.controller = controller
         if ident is not None:
             self.ident = ident
@@ -47,7 +47,7 @@ class Agent:
         new_agent = copy.copy(self)
         new_agent.ident = new_agent.get_ident()
         if register_with_group and self.group is not None:
-            group = self.controller.group(self.group)
+            group = self.group
             group.members.append(new_agent)
             group.update_size()
         if register_with_controller and self.controller is not None:
@@ -121,7 +121,7 @@ class Group:
             agents = self.controller.agents
         self.members = []
         for a in agents:
-            if a.group == self.ident:
+            if a.group == self:
                 self.members.append(a)
         self.update_size()
 
@@ -254,7 +254,7 @@ class Controller:
             raise TypeError("Too few arguments. At least one of agent= and ident= must be specified.")
 
         if agent.group is not None:
-            self.group(agent.group).members.remove(agent)
+            agent.group.members.remove(agent)
             agent.group = None
         self.agents.remove(agent)
         self.update_counts()
@@ -276,15 +276,14 @@ class Controller:
             target_group = self.group(target_group_ident)
 
         # Remove from original group if agent was in one
-        original_group_ident = agent.group
-        if original_group_ident is not None:
-            original_group = self.group(original_group_ident)
+        original_group = agent.group
+        if original_group is not None:
             original_group.members.remove(agent)
             original_group.decrement_size()
 
         # Move to new group if specified, else move out of all groups
         if target_group is not None:
-            agent.group = target_group.ident
+            agent.group = target_group
             target_group.members.append(agent)
             target_group.increment_size()
         else:
@@ -325,12 +324,9 @@ class Controller:
         for g in groups:
             g.members = []
 
-        g_dict = dict((g.ident, g) for g in groups)
         for a in agents:
             if a.group is not None:
-                g = g_dict[a.group]
-                if g is not None:
-                    g.members.append(a)
+                g.members.append(a)
                     
         for g in groups:
             g.update_size()

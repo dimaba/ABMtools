@@ -140,17 +140,16 @@ class Agent(ABMtools.Agent):
 
 
         if self.type == "shirker":
-            own_group = self.controller.group(self.group)
             # Maximum acceptable percentage of reciprocators in the group to shirk at all
             fr_max = ((2 * self.controller.cooperation_cost + (self.controller.cooperation_gain /
-                                                               own_group.size)) /
+                                                               self.group.size)) /
                       self.ostracism_estimate_cost)
 
             if own_group.fraction_reciprocators > fr_max:
                 self.shirking_decision = 0
             else:
-                self.shirking_decision = (1 - (own_group.fraction_reciprocators * self.ostracism_estimate_cost *
-                                          own_group.size - self.controller.cooperation_gain) / (2 * self.controller.cooperation_cost * own_group.size))
+                self.shirking_decision = (1 - (self.group.fraction_reciprocators * self.ostracism_estimate_cost *
+                                          self.group.size - self.controller.cooperation_gain) / (2 * self.controller.cooperation_cost * self.group.size))
 
                 #print("(1 - ({} * {} * {} - {}) / (2 * {} * {}))".format(own_group.fraction_reciprocators, self.ostracism_estimate_cost, own_group.size,
                 #                                                      self.controller.cooperation_gain, self.controller.cooperation_cost, own_group.size))
@@ -170,8 +169,8 @@ class Agent(ABMtools.Agent):
         :return:
         """
         if self.group is not None:
-            own_group_fraction_shirkers = self.controller.group(self.group).fraction_shirkers
-            own_group_shirking_rate = self.controller.group(self.group).shirking_rate
+            own_group_fraction_shirkers = self.group.fraction_shirkers
+            own_group_shirking_rate = self.group.shirking_rate
             cooperation_gain = self.controller.cooperation_gain
             cooperation_cost = self.controller.cooperation_cost
             punishing_cost = self.controller.punishing_cost
@@ -223,7 +222,7 @@ def setup():
     for g in c.groups:
         for _ in range(c.initial_group_size):
             agent = random.choice(agents_without_group)
-            agent.group = g.ident
+            agent.group = g
             agents_without_group.remove(agent)
 
     c.census()
@@ -274,7 +273,7 @@ def step(i, c):
         # DIFFERENCE FROM NETLOGO IMPLEMENTATION: NO RECALCULATION OF RELEVANT GROUP VARIABLES
         # RATIONALE: Ostracism should happen based on same variables used to calculate shirking decisions and fitnesses
     for a in [a for a in c.agents if a.type == "shirker" and a.group is not None]:
-        ostracism_probability = a.controller.group(a.group).fraction_reciprocators * a.shirking_decision
+        ostracism_probability = a.group.fraction_reciprocators * a.shirking_decision
         if random.uniform(0, 1) < ostracism_probability:
             c.move(a, None)
             #print("OSTRACIZED to group {}".format(a.group))
@@ -363,10 +362,17 @@ if __name__ == "__main__":
 
     t.set_step(step, 1, t.controller)
 
-    from datetime import datetime
-    now = datetime.now()
-    for _ in range(10000):
-        t.step()
-    then = datetime.now()
-    diff = then - now
-    print(diff)
+    def run():
+        from datetime import datetime
+        now = datetime.now()
+        for _ in range(10000):
+            t.step()
+        then = datetime.now()
+        diff = then - now
+        print(diff)
+
+    import cProfile
+    import pstats
+    #cProfile.run('run()', 'Profiles/bowles_gintis')
+    p = pstats.Stats('Profiles/bowles_gintis')
+    p.strip_dirs().sort_stats('cumulative').print_stats()

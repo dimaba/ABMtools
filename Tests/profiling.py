@@ -3,6 +3,7 @@ parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0, parentdir)
 import ABMtools
 import random
+import pytest
 import cProfile
 import pstats
 import pickle
@@ -76,6 +77,35 @@ def profile_clear_group():
     p.strip_dirs().sort_stats('cumulative').print_stats()
 
 
+def test_group():
+    print('Testing ABMtools.Controller.group() with an ident which corresponds to exactly one group')
+    print('Expected behavior: Returns agent instance with specified agent')
+    print('Ident to find: {}, Groups with this ident: {}'.format(500, len([x for x in c.groups if x.ident == 500])))
+    print('Corresponding group: {}'.format(next(x for x in c.groups if x.ident == 500)))
+    print('Group found: {}'.format(c.group(500)))
+    print('Testing ABMtools.Controller.group() with an ident for which no corresponding group exists')
+    print('Expected behavior: Raises KeyError')
+    c.groups.remove(next(x for x in c.groups if x.ident == 500))
+    print('Ident to find: {}, Groups with this ident: {}'.format(500, len([x for x in c.groups if x.ident == 500])))
+    with pytest.raises(KeyError) as excinfo:
+        c.group(500)
+    print('Exception raised: "{}: {}"'.format(excinfo.type, excinfo.value))
+    print('Testing ABMtools.Controller.group() with an ident for which more than one corresponding group exists')
+    print('Expected behavior: Raises KeyError')
+    c.create_groups(2, ident=500)
+    print('Ident to find: {}, Groups with this ident: {}'.format(500, len([x for x in c.groups if x.ident == 500])))
+    with pytest.raises(KeyError) as excinfo:
+        c.group(500)
+    print('Exception raised: "{}: {}"'.format(excinfo.type, excinfo.value))
+
+
+def profile_group():
+    new_test()
+    cProfile.run('test_group()', 'Profiles/Controller_group')
+    p = pstats.Stats('Profiles/Controller_group')
+    p.strip_dirs().sort_stats('cumulative').print_stats()
+
+
 ###########################################################################
 c, g, a = clean_start()
-profile_clear_group()
+profile_group()

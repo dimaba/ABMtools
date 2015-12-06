@@ -34,7 +34,7 @@ class Partier(ABMtools.Agent):
         self.happy = happy
 
     def update_happiness(self):
-        othergenderratio = len([i for i in self.controller.group(self.group).members if i.sex != self.sex]) / len([i for i in self.controller.group(self.group).members])
+        othergenderratio = len([i for i in self.group.members if i.sex != self.sex]) / len([i for i in self.group.members])
         self.happy = othergenderratio <= (self.controller.tolerance / 100)
 
 
@@ -81,7 +81,7 @@ def step(c, i):
     for a in c.agents:
         a.update_happiness()
         if not a.happy:
-            a.group = random.choice(ABMtools.other(a.group, [i.ident for i in c.groups]))
+            a.group = random.choice(ABMtools.other(a.group, c.groups))
 
         # Count the number of boring groups
     c.count_boring()

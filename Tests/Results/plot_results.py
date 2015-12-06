@@ -16,7 +16,7 @@ fs = [line[1] for line in data]
 fc = [line[2] for line in data]
 fr = [line[3] for line in data]
 
-plt.plot(fs[:2000], 'r-')
-plt.plot(fc[:2000], 'y-')
-plt.plot(fr[:2000], 'b-')
+plt.plot(fs[:10000], 'r-')
+plt.plot(fc[:10000], 'y-')
+plt.plot(fr[:10000], 'b-')
 plt.show()

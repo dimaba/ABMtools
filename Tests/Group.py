@@ -68,9 +68,9 @@ def test_ungroup():
     # Ungroup without killing
     g.ungroup()
     print('Number of members after in g.members: {}'.format(len(g.members)))
-    print('Number of members after from agentlist: {}'.format(len([i for i in c.agents if i.group == g.ident])))
+    print('Number of members after from agentlist: {}'.format(len([i for i in c.agents if i.group is g])))
     print('Number of agents after: {}'.format(len(c.agents)))
-    assert (len(g.members) == 0) and (len([i for i in c.agents if i.group == g.ident]) == 0) and (len(c.agents) == agentsatstart)
+    assert (len(g.members) == 0) and (len([i for i in c.agents if i.group is g]) == 0) and (len(c.agents) == agentsatstart)
 
     # Restore members
     c, g, a = clean_start()
@@ -83,7 +83,7 @@ def test_ungroup():
     # Ungroup with killing
     g.ungroup(kill=True)
     print('Number of members after in g.members: {}'.format(len(g.members)))
-    print('Number of members after from agentlist: {}'.format(len([i for i in c.agents if i.group == g.ident])))
+    print('Number of members after from agentlist: {}'.format(len([i for i in c.agents if i.group is g])))
     print('Number of agents after: {}'.format(len(c.agents)))
     assert (len(g.members) == 0) and (len(c.agents) == agentsatstart - membersatstart)
 
