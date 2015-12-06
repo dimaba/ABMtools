@@ -339,7 +339,6 @@ class Controller:
 class Ticker:
     # The ticker stores summary variables across periods, handles any functions that need to be called in each step of
     # the model
-    # REMOVED THE WRITING TO FILE STUFF FOR NOW, WILL ADD THAT IN SYSTEMATICALLY LATER
     # SETUP FUNCTION MUST RETURN A CONTROLLER OBJECT
     def __init__(self, controller=None, interval=1, run=1, outfile="Results/run.txt"):
         self.run = run
