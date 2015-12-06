@@ -40,6 +40,10 @@ class Agent:
         """ Create one new agent in the same group which copies all attributes other than ident."""
         new_agent = copy.copy(self)
         new_agent.ident = new_agent.get_ident()
+        if self.group is not None:
+            group = self.controller.group(self.group)
+            group.members.append(new_agent)
+            group.update_size()
         return new_agent
         
         
@@ -144,6 +148,7 @@ class Group:
 
         self.members += agents
         self.controller.agents += agents
+        self.update_size()
 
         
 class Tie:
