@@ -245,6 +245,8 @@ class Controller:
         self.agents.remove(agent)
         self.update_counts()
 
+    # TODO: Add move() to move agent from one group to another
+
     def agent(self, ident):
         # Returns the instance of a single agent with a given ident
         if len([x for x in self.agents if x.ident == ident]) == 1:
