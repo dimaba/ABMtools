@@ -145,7 +145,7 @@ class Agent(ABMtools.Agent):
                                                                self.group.size)) /
                       self.ostracism_estimate_cost)
 
-            if own_group.fraction_reciprocators > fr_max:
+            if self.group.fraction_reciprocators > fr_max:
                 self.shirking_decision = 0
             else:
                 self.shirking_decision = (1 - (self.group.fraction_reciprocators * self.ostracism_estimate_cost *
@@ -224,6 +224,7 @@ def setup():
             agent = random.choice(agents_without_group)
             agent.group = g
             agents_without_group.remove(agent)
+
 
     c.census()
 
@@ -373,6 +374,6 @@ if __name__ == "__main__":
 
     import cProfile
     import pstats
-    #cProfile.run('run()', 'Profiles/bowles_gintis')
+    cProfile.run('run()', 'Profiles/bowles_gintis')
     p = pstats.Stats('Profiles/bowles_gintis')
     p.strip_dirs().sort_stats('cumulative').print_stats()

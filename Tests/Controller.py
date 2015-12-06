@@ -170,8 +170,8 @@ def test_census():
     c.create_groups(10)
     print('Create 10 groups: {}'.format([x.ident for x in c.groups]))
     for i in range(10):
-        c.create_agents(10, group=i)
-    rd = {i: len([a for a in c.agents if a.group.ident == i]) for i in range(10)}
+        c.create_agents(10, group=c.group(i))
+    rd = {i: len([a for a in c.agents if a.group == i]) for i in range(10)}
     print('Create 100 agents, 10 per group: {}'.format(rd))
     print('Length of group member lists before census: {}'.format([len(x.members) for x in c.groups]))
     print('Reported group sizes as group property before census: {}'.format([x.size for x in c.groups]))

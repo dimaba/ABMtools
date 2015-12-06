@@ -326,7 +326,7 @@ class Controller:
 
         for a in agents:
             if a.group is not None:
-                g.members.append(a)
+                a.group.members.append(a)
                     
         for g in groups:
             g.update_size()
