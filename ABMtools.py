@@ -239,8 +239,9 @@ class Controller:
         elif agent is None and ident is None:
             raise TypeError("Too few arguments. At least one of agent= and ident= must be specified.")
 
-        self.group(agent.group).members.remove(agent)
-        agent.group = None
+        if agent.group is not None:
+            self.group(agent.group).members.remove(agent)
+            agent.group = None
         self.agents.remove(agent)
         self.update_counts()
 
@@ -321,7 +322,7 @@ class Ticker:
         setupattr = [getattr(self.controller, var) for var in self.controller.setupvars.keys()]
         for varname, value in zip(self.controller.setupvars.values(), setupattr):
             header += ("{} = {}\n".format(varname, value))
-        header += ",".join(self.controller.reporters.values()) + "\n"
+        header += ",".join([str(v) for v in self.controller.reporters.values()]) + "\n"
         return header
 
     def set_step(self, func, *args, **kwargs):
