@@ -193,7 +193,7 @@ class Agent(ABMtools.Agent):
 def setup():
     # Setup global variables by creating a controller with these properties
     c = Controller(initial_group_size=20, initial_num_groups=20, min_group_size=6, fitness_in_pool=-0.1,
-                   initial_fraction_cooperators=0.05, initial_fraction_reciprocators=0.05, cooperation_cost=0.1,
+                   initial_fraction_cooperators=0.2, initial_fraction_reciprocators=0.2, cooperation_cost=0.1,
                    punishing_cost=0.1, cooperation_gain=0.2, immigration_fraction=0.03, emigration_fraction=0.05,
                    mutation_rate=0.1)
 
@@ -269,7 +269,6 @@ def step(i, c):
                 if random.uniform(0,1) < c.mutation_rate:
                     new_agent.type = random.choice(["shirker", "cooperator", "reciprocator"])
                     #print("MUTATE to {}".format(new_agent.type))
-                c.agents.append(new_agent)
 
     # Ostracize
         # DIFFERENCE FROM NETLOGO IMPLEMENTATION: NO RECALCULATION OF RELEVANT GROUP VARIABLES
@@ -277,7 +276,7 @@ def step(i, c):
     for a in [a for a in c.agents if a.type == "shirker" and a.group is not None]:
         ostracism_probability = a.controller.group(a.group).fraction_reciprocators * a.shirking_decision
         if random.uniform(0, 1) < ostracism_probability:
-            a.group = None
+            c.move(a, None)
             #print("OSTRACIZED to group {}".format(a.group))
 
     # Migrate
@@ -304,7 +303,7 @@ def step(i, c):
             # IT IS CURRENTLY POSSIBLE FOR MIGRANTS TO MIGRATE TO THEIR OWN GROUP
             migrant = random.choice(migration_pool)
             #print("MIGRATING FROM GROUP {} TO GROUP {}".format(migrant.group, g.ident))
-            migrant.group = g.ident
+            c.move(migrant, g)
             migration_pool.remove(migrant)
 
         # If migration pool is empty don't attempt migration for this or any other group
@@ -315,14 +314,14 @@ def step(i, c):
         if random.uniform(0, 1) < immigrants_remainder:
             migrant = random.choice(migration_pool)
             #print("MIGRATING FROM GROUP {} TO GROUP {}".format(migrant.group, g.ident))
-            migrant.group = g.ident
+            c.move(migrant, g)
             migration_pool.remove(migrant)
+    c.census()
+    c.update_counts()
 
     # IF GENERATIONS GENERATIONS
 
     # Cull population if above starting total
-    c.census()
-    c.update_counts()
     while c.n_agents > (c.initial_num_groups * c.initial_group_size):
         doomed_agent = random.choice(c.agents)
         #print("CULL {}".format(a.type))
@@ -332,23 +331,19 @@ def step(i, c):
     for g in c.groups:
         if g.size < c.min_group_size:
             #print("CLEAR GROUP {}".format(g.ident))
-            for a in g.members:
-                a.group = None
+            g.ungroup()
 
             for _ in range(c.initial_group_size):
                 largest_group = ABMtools.max_one_of(c.groups, 'size')
                 if largest_group.size > c.min_group_size:
                     #print("TAKE FROM GROUP {} OF SIZE {}".format(largest_group.ident, largest_group.size))
                     migrant = random.choice(largest_group.members)
-                    migrant.group = g.ident
-                    largest_group.members.remove(migrant)
-                    largest_group.size -= 1
-                    # USE THIS AS TEMPLATE FOR MOVE FUNCTION
+                    c.move(migrant, g)
                 elif len([a for a in c.agents if a.group is None]) > 0:
                     #print("TAKE FROM POOL")
                     pool = [a for a in c.agents if a.group is None]
                     migrant = random.choice(pool)
-                    migrant.group = g.ident
+                    c.move(migrant, g)
                 else:
                     print("TAKE FROM RANDOM GROUP")
                     pass
@@ -370,7 +365,7 @@ if __name__ == "__main__":
 
     from datetime import datetime
     now = datetime.now()
-    for _ in range(2000):
+    for _ in range(10000):
         t.step()
     then = datetime.now()
     diff = then - now
