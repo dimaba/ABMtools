@@ -1,5 +1,7 @@
 # ABMtools
 
+*This package is sort of ready to use. A lot of the intended functionality is there. However, all of it might be redesigned in the future, and changes will likely not be backwards-compatible.*
+
 ## Goals and non-goals
 The goal of this project is to avoid having to write the same things over and over for each Agent-Based Model you create. Every model tends to need agents, groups, some global element to control and keep track of these agents and groups, and supporting functions which are frequently used.
 This package is meant to provide base cases for these classes and functions, with enough functionality that the only additions you have to write yourself will be functionality specific to the model you are writing.
