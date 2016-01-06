@@ -11,6 +11,7 @@ This package is meant to provide base cases for these classes and functions, wit
 2. Classes and functions to set up and run a model.
 3. Connections between agents and groups
 4. Ability to create a grid-based world and functions to make managing this world easier
+5. Ability to simulate multiple runs of the model in parallel
 
 ### Stuff that shouldn't be in a final version
 1. Real-time visualization. This is not NetLogo and doesn't want to be (although I take some inspiration from it here and there).
