@@ -2,13 +2,13 @@ import os
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0, parentdir)
 import pickle
-import ABMtools
+import abmtools
 
 # SETUP TEST ENVIRONMENT
 def clean_start():
     print('### ###  Reloading start state  ### ###')
     cin = pickle.load(open('setup.p', 'rb'))
-    ABMtools.a_ident=100000
+    abmtools.a_ident=100000
     cin.census()
     gin = cin.groups[0]
     ain = gin.members[0]
@@ -20,10 +20,10 @@ def new_test():
 
 def test_tie_creation():
     new_test()
-    print('Test ABMtools.Tie() creation')
+    print('Test abmtools.Tie() creation')
     print('Expected behavior: Raises NotImplementedError as ties are not yet implemented')
     try:
-        t = ABMtools.Tie()
+        t = abmtools.Tie()
         assert False
     except NotImplementedError as e:
         print(e)

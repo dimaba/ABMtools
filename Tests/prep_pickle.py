@@ -1,8 +1,8 @@
-import ABMtools
+import abmtools
 import random
 import pickle
 
-c = ABMtools.Controller()
+c = abmtools.Controller()
 for i in range(100000):
     c.create_agents(1, group=None)
 for i in range(1000):

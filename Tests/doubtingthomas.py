@@ -5,11 +5,11 @@ from collections import OrderedDict
 import os
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0,parentdir)
-import ABMtools
+import abmtools
 
-class Controller(ABMtools.Controller):
+class Controller(abmtools.Controller):
     def __init__(self, decayrate, efficiency, exit_chance, reporters):
-        ABMtools.Controller.__init__()
+        abmtools.Controller.__init__()
         self.decayrate = decayrate
         self.efficiency = efficiency
         self.exit_chance = exit_chance
@@ -25,9 +25,9 @@ class Controller(ABMtools.Controller):
         self.total_feedback = math.fsum([g.feedback for g in self.groups])
         self.percent_dissatisfied = len([a for a in self.agents if a.dissatisfied]) / len(self.agents)
 
-class Group(ABMtools.Group):
+class Group(abmtools.Group):
     def __init__(self, controller, quality=0):
-        ABMtools.Group.__init__(controller)
+        abmtools.Group.__init__(controller)
         self.quality = quality
         self.feedback = 0
         self.exiters = []
@@ -46,9 +46,9 @@ class Group(ABMtools.Group):
             return -1
         return statistics.mean([a.threshold for a in self.groupmembers])
 
-class Actor(ABMtools.Agent):
+class Actor(abmtools.Agent):
     def __init__(self, controller):
-        ABMtools.Agent.__init__(controller)
+        abmtools.Agent.__init__(controller)
         self.threshold = 400 + random.randrange(-395, 395)
         self.feedback = 0
         self.dissatisfied = False

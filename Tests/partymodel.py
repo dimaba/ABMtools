@@ -2,16 +2,16 @@
 import os
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0,parentdir)
-import ABMtools
+import abmtools
 import random
 import sys
 
-class Party(ABMtools.Controller):
+class Party(abmtools.Controller):
     # Parties have the following attributes:
     # 1. Total number present, 2. Number of groups in which they are split,
     # 3. Tolerance for other-sex in %, 4. Number of boring (single-sex) groups
     def __init__(self, n, k, tolerance, *args, **kwargs):
-        ABMtools.Controller.__init__(self, *args, **kwargs)
+        abmtools.Controller.__init__(self, *args, **kwargs)
         self.n = n
         self.k = k
         self.tolerance = tolerance
@@ -24,12 +24,12 @@ class Party(ABMtools.Controller):
                 bg += 1
         self.boringgroups = bg
 
-class Partier(ABMtools.Agent):
-    # Partiers use the 'group' attribute, which exists in ABMtools.Agent, to define their group
+class Partier(abmtools.Agent):
+    # Partiers use the 'group' attribute, which exists in abmtools.Agent, to define their group
     # They are either happy or unhappy as function of the boringness of their group and the
     # current tolerance, and are either male (M) or female (F)
     def __init__(self, controller, sex, happy=False, *args, **kwargs):
-        ABMtools.Agent.__init__(self, controller, *args, **kwargs)
+        abmtools.Agent.__init__(self, controller, *args, **kwargs)
         self.sex = sex
         self.happy = happy
 
@@ -81,7 +81,7 @@ def step(c, i):
     for a in c.agents:
         a.update_happiness()
         if not a.happy:
-            a.group = random.choice(ABMtools.other(a.group, c.groups))
+            a.group = random.choice(abmtools.other(a.group, c.groups))
 
         # Count the number of boring groups
     c.count_boring()

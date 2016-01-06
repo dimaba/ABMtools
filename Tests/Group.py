@@ -1,7 +1,7 @@
 import os
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0, parentdir)
-import ABMtools
+import abmtools
 import pickle
 import random
 
@@ -9,7 +9,7 @@ import random
 def clean_start():
     print('### ###  Reloading start state  ### ###')
     cin = pickle.load(open('setup.p', 'rb'))
-    ABMtools.a_ident=100000
+    abmtools.a_ident=100000
     cin.census()
     gin = cin.groups[0]
     ain = gin.members[0]
@@ -21,28 +21,28 @@ def new_test():
 
 def test_group_creation():
     new_test()
-    c = ABMtools.Controller()
-    print('Test ABMtools.Group() creation')
+    c = abmtools.Controller()
+    print('Test abmtools.Group() creation')
     print('Expected behavior: Two groups are created')
-    a,b = ABMtools.Group(c), ABMtools.Group(c)
+    a,b = abmtools.Group(c), abmtools.Group(c)
     print('Group 1: {}, Group 2: {}'.format(a, b))
 
 
 def test_collect_members():
     new_test()
     c, g, a = clean_start()
-    print('Test ABMtools.Group.collect_members() on fresh data')
+    print('Test abmtools.Group.collect_members() on fresh data')
     print('Expected behavior: Should collect all agents in an agentset whose group number matches ident of group')
-    a_set = [ABMtools.Agent(c) for _ in range(10)]
+    a_set = [abmtools.Agent(c) for _ in range(10)]
     for na in a_set:
         na.group = random.choice([1,2])
-    ng = ABMtools.Group(c, ident=1)
+    ng = abmtools.Group(c, ident=1)
     ng.collect_members(a_set)
     print('Agents with correct group number: {}'.format(len([na for na in a_set if na.group == 1])))
     print('Collected agents: {}'.format(len(ng.members)))
     assert len([na for na in a_set if na.group == 1]) == len(ng.members)
 
-    print('Test ABMtools.Group.collect_members() on known data')
+    print('Test abmtools.Group.collect_members() on known data')
     print('Expected behavior: Number of members in group should be the same before and after collecting')
     print('(In known data groups already have correct member lists.)')
     print('Number of members before: {}'.format(len(g.members)))
@@ -55,7 +55,7 @@ def test_collect_members():
 def test_ungroup():
     new_test()
     c, g, a = clean_start()
-    print('Test ABMtools.Group.ungroup() without killing agents')
+    print('Test abmtools.Group.ungroup() without killing agents')
     print('Expected behavior: All members are removed from the group.')
     print('Member list is left empty and agents are given None group')
     print('Agents are still in controller agent list')
@@ -74,7 +74,7 @@ def test_ungroup():
 
     # Restore members
     c, g, a = clean_start()
-    print('Test ABMtools.Group.ungroup() with killing agents')
+    print('Test abmtools.Group.ungroup() with killing agents')
     print('Expected behavior: All members are removed from the group.')
     print('Member list is left empty and agents are given None group')
     print('Agents are removed from controller agent list')
@@ -91,7 +91,7 @@ def test_ungroup():
 def test_sprout():
     new_test()
     c, g, a = clean_start()
-    print('Test ABMtools.Group.sprout()')
+    print('Test abmtools.Group.sprout()')
     print('Expected behavior: sprout() returns N agents with set group')
     print('Agents should be appended to group.members and to controller.agents')
     print('Tested with N=2')

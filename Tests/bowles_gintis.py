@@ -2,7 +2,7 @@ import os
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0, parentdir)
 
-import ABMtools
+import abmtools
 import random
 import collections
 import statistics
@@ -16,7 +16,7 @@ Three types of agents:
 They are all agents but are distinguished by different behavior.
 """
 
-class Controller(ABMtools.Controller):
+class Controller(abmtools.Controller):
     """
     Controller:
         Properties: initial size of groups, initial number of groups, minimum group size,
@@ -28,7 +28,7 @@ class Controller(ABMtools.Controller):
                  initial_fraction_cooperators, initial_fraction_reciprocators, cooperation_cost,
                  punishing_cost, cooperation_gain, immigration_fraction, emigration_fraction, mutation_rate,
                  *args, **kwargs):
-        ABMtools.Controller.__init__(self, *args, **kwargs)
+        abmtools.Controller.__init__(self, *args, **kwargs)
         self.initial_group_size = initial_group_size
         self.initial_num_groups = initial_num_groups
         self.min_group_size = min_group_size
@@ -68,11 +68,11 @@ class Controller(ABMtools.Controller):
         Store size of smallest and largest group
         :return:
         """
-        self.smallest_group_size = ABMtools.min_one_of(self.groups, 'size').size
-        self.largest_group_size = ABMtools.max_one_of(self.groups, 'size').size
+        self.smallest_group_size = abmtools.min_one_of(self.groups, 'size').size
+        self.largest_group_size = abmtools.max_one_of(self.groups, 'size').size
 
 
-class Group(ABMtools.Group):
+class Group(abmtools.Group):
     """
     Prototype group:
         Properties: group size
@@ -82,7 +82,7 @@ class Group(ABMtools.Group):
         group-size-at-shirking? group-fr-at-shirking? group-fs-at-shirking?
     """
     def __init__(self, *args, **kwargs):
-        ABMtools.Group.__init__(self, *args, **kwargs)
+        abmtools.Group.__init__(self, *args, **kwargs)
         self.fraction_shirkers = None
         self.fraction_cooperators = None
         self.fraction_reciprocators = None
@@ -111,13 +111,13 @@ class Group(ABMtools.Group):
             self.shirking_rate = 0
 
 
-class Agent(ABMtools.Agent):
+class Agent(abmtools.Agent):
     """
     Prototype agent:
         Properties: type (c,s,r) estimated loss from ostracism, fitness, age, shirking decision
     """
     def __init__(self, controller, strategy_type, ostracism_estimate_cost, fitness=None, age=None, shirking_decision=None, *args, **kwargs):
-        ABMtools.Agent.__init__(self, controller, *args, **kwargs)
+        abmtools.Agent.__init__(self, controller, *args, **kwargs)
         self.type = strategy_type
         self.ostracism_estimate_cost = ostracism_estimate_cost
         self.fitness = fitness
@@ -334,7 +334,7 @@ def step(i, c):
             g.ungroup()
 
             for _ in range(c.initial_group_size):
-                largest_group = ABMtools.max_one_of(c.groups, 'size')
+                largest_group = abmtools.max_one_of(c.groups, 'size')
                 if largest_group.size > c.min_group_size:
                     #print("TAKE FROM GROUP {} OF SIZE {}".format(largest_group.ident, largest_group.size))
                     migrant = random.choice(largest_group.members)
@@ -357,7 +357,7 @@ def step(i, c):
     #print([g.size for g in c.groups])
 
 if __name__ == "__main__":
-    t = ABMtools.Ticker()
+    t = abmtools.Ticker()
     t.set_setup(setup)
     t.setup()
 

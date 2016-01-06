@@ -1,7 +1,7 @@
 import os
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0,parentdir)
-import ABMtools
+import abmtools
 import pickle
 import pytest
 import random
@@ -10,7 +10,7 @@ import random
 def clean_start():
     print('### ###  Reloading start state  ### ###')
     cin = pickle.load(open('setup.p', 'rb'))
-    ABMtools.a_ident=100000
+    abmtools.a_ident=100000
     cin.census()
     gin = cin.groups[0]
     ain = gin.members[0]
@@ -24,25 +24,25 @@ def test_create_agents(N=7):
     new_test()
     c, g, a = clean_start()
     agentsatstart = len(c.agents)
-    print("Testing ABMtools.Controller.create_agents() with base class Agent")
+    print("Testing abmtools.Controller.create_agents() with base class Agent")
     print('Expected behavior: Creates N agents with given properties and adds it to agent list')
     print('Tested with N=7')
     print("Number of agents: {}".format(len(c.agents)))
-    c.create_agents(n=N, agenttype=ABMtools.Agent, agentlist='agents', group=1)
+    c.create_agents(n=N, agenttype=abmtools.Agent, agentlist='agents', group=1)
     print("Number of agents: {}".format(len(c.agents)))
     print("Latest agent: {}".format(c.agents[-1]))
     assert len(c.agents) == (agentsatstart + N)
     agentsatstart = len(c.agents)
 
     # DERIVED CLASS TEST
-    class Person(ABMtools.Agent):
+    class Person(abmtools.Agent):
         a_ident = 0
         def __init__(self, controller, sex="M", happy=False, *args, **kwargs):
-            ABMtools.Agent.__init__(self, controller, *args, **kwargs)
+            abmtools.Agent.__init__(self, controller, *args, **kwargs)
             self.sex = sex
             self.happy = happy
 
-    print("Testing ABMtools.Controller.create_agents() with derived class Person")
+    print("Testing abmtools.Controller.create_agents() with derived class Person")
     print("Number of agents: {}".format(len(c.agents)))
     c.create_agents(n=N, agenttype=Person, agentlist='agents', sex="M", group=2)
     print("Number of agents: {}".format(len(c.agents)))
@@ -50,15 +50,15 @@ def test_create_agents(N=7):
     assert len(c.agents) == (agentsatstart + N)
     agentsatstart = len(c.agents)
 
-    print("Testing ABMtools.Controller.cra() with base class Agent")
+    print("Testing abmtools.Controller.cra() with base class Agent")
     print("Number of agents: {}".format(len(c.agents)))
-    c.create_agents(n=N, agenttype=ABMtools.Agent, agentlist='agents', group=3)
+    c.create_agents(n=N, agenttype=abmtools.Agent, agentlist='agents', group=3)
     print("Number of agents: {}".format(len(c.agents)))
     print("Latest agent: {}".format(c.agents[-1]))
     assert len(c.agents) == (agentsatstart + N)
     agentsatstart = len(c.agents)
 
-    print("Testing ABMtools.Controller.cra() with derived class Person")
+    print("Testing abmtools.Controller.cra() with derived class Person")
     print("Number of agents: {}".format(len(c.agents)))
     c.create_agents(n=N, agenttype=Person, agentlist='agents', sex="M", group=4)
     print("Number of agents: {}".format(len(c.agents)))
@@ -69,7 +69,7 @@ def test_create_agents(N=7):
 def test_clear_groups():
     new_test()
     c, g, a = clean_start()
-    print('Testing ABMtools.Controller.clear_agents() without kill')
+    print('Testing abmtools.Controller.clear_agents() without kill')
     print('Expected behavior: All groups are without members. All agents get group set to None')
     print('Equal number of agents in list before and after')
     print('Agents in list before: {}'.format(len(c.agents)))
@@ -82,7 +82,7 @@ def test_clear_groups():
     print('All agents have group set to None after? {}'.format(all(i.group is None for i in c.agents)))
     assert (len(c.agents) == len_start) and (all([x.size == 0 for x in c.groups])) and (all(i.group is None for i in c.agents))
     ct, gt, at = clean_start()
-    print('Testing ABMtools.Controller.clear_agents() with kill')
+    print('Testing abmtools.Controller.clear_agents() with kill')
     print('Expected behavior: All groups are without members. All agents get group set to None')
     print('Agent list is empty after')
     print('Agents in list before: {}'.format(len(c.agents)))
@@ -97,7 +97,7 @@ def test_clear_groups():
 def test_kill():
     new_test()
     c, g, a = clean_start()
-    print('Testing ABMtools.Controller.kill() by passing agent')
+    print('Testing abmtools.Controller.kill() by passing agent')
     print('Expected behavior: Agent is removed from agent list, agent has group set to None')
     print('Agent is removed from group member list')
     print('Agent to kill: {}'.format(a))
@@ -116,19 +116,19 @@ def test_kill():
 def test_agent():
     new_test()
     c, g, a = clean_start()
-    print('Testing ABMtools.Controller.agent() with an ident which corresponds to exactly one agent')
+    print('Testing abmtools.Controller.agent() with an ident which corresponds to exactly one agent')
     print('Expected behavior: Returns agent instance with specified ident')
     print('Ident to find: {}, Agents with this ident: {}'.format(5000, len([x for x in c.agents if x.ident == 5000])))
     print('Corresponding agent: {}'.format(next(x for x in c.agents if x.ident == 5000)))
     print('Agent found: {}'.format(c.agent(5000)))
-    print('Testing ABMtools.Controller.agent() with an ident for which no corresponding agent exists')
+    print('Testing abmtools.Controller.agent() with an ident for which no corresponding agent exists')
     print('Expected behavior: Raises KeyError')
     c.kill(ident=5000)
     print('Ident to find: {}, Agents with this ident: {}'.format(5000, len([x for x in c.agents if x.ident == 5000])))
     with pytest.raises(KeyError) as excinfo:
         c.agent(5000)
     print('Exception raised: "{}: {}"'.format(excinfo.type, excinfo.value))
-    print('Testing ABMtools.Controller.agent() with an ident for which more than one corresponding agent exists')
+    print('Testing abmtools.Controller.agent() with an ident for which more than one corresponding agent exists')
     print('Expected behavior: Raises KeyError')
     c.create_agents(2, ident=5000)
     print('Ident to find: {}, Agents with this ident: {}'.format(5000, len([x for x in c.agents if x.ident == 5000])))
@@ -140,19 +140,19 @@ def test_agent():
 def test_group():
     new_test()
     c, g, a = clean_start()
-    print('Testing ABMtools.Controller.group() with an ident which corresponds to exactly one group')
+    print('Testing abmtools.Controller.group() with an ident which corresponds to exactly one group')
     print('Expected behavior: Returns agent instance with specified agent')
     print('Ident to find: {}, Groups with this ident: {}'.format(500, len([x for x in c.groups if x.ident == 500])))
     print('Corresponding group: {}'.format(next(x for x in c.groups if x.ident == 500)))
     print('Group found: {}'.format(c.group(500)))
-    print('Testing ABMtools.Controller.group() with an ident for which no corresponding group exists')
+    print('Testing abmtools.Controller.group() with an ident for which no corresponding group exists')
     print('Expected behavior: Raises KeyError')
     c.groups.remove(next(x for x in c.groups if x.ident == 500))
     print('Ident to find: {}, Groups with this ident: {}'.format(500, len([x for x in c.groups if x.ident == 500])))
     with pytest.raises(KeyError) as excinfo:
         c.group(500)
     print('Exception raised: "{}: {}"'.format(excinfo.type, excinfo.value))
-    print('Testing ABMtools.Controller.group() with an ident for which more than one corresponding group exists')
+    print('Testing abmtools.Controller.group() with an ident for which more than one corresponding group exists')
     print('Expected behavior: Raises KeyError')
     c.create_groups(2, ident=500)
     print('Ident to find: {}, Groups with this ident: {}'.format(500, len([x for x in c.groups if x.ident == 500])))
@@ -163,10 +163,10 @@ def test_group():
 
 def test_census():
     new_test()
-    c = ABMtools.Controller()
-    print('Testing ABMtools.Controller.census()')
+    c = abmtools.Controller()
+    print('Testing abmtools.Controller.census()')
     print('Expected behavior: all agents are in their respective groups, all groups are complete')
-    ABMtools.a_ident, ABMtools.g_ident = 0,0
+    abmtools.a_ident, abmtools.g_ident = 0, 0
     c.create_groups(10)
     print('Create 10 groups: {}'.format([x.ident for x in c.groups]))
     for i in range(10):
