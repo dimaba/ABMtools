@@ -14,7 +14,7 @@ This package is meant to provide base cases for these classes and functions, wit
 5. Ability to simulate multiple runs of the model in parallel
 
 ### Stuff that shouldn't be in a final version
-1. Real-time visualization. This is not NetLogo and doesn't want to be (although I take some inspiration from it here and there).
+1. Real-time visualization. This is not NetLogo and doesn't want to be (although I take some inspiration from it here and there, e.g. in how functions are named).
 2. GUI. This will be a script-only package. You will not be able to start, stop or control your simulations through a graphical interface unless you design one yourself.
 3. Analysis tools. This package should be light-weight, with few dependencies outside of the Python 3 standard library. The best assistance this package can give to aid analysis is to output results in a way which established analysis tools (e.g. Matplotlib & pandas for Python, or other software like R) can read.
 
