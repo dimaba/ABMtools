@@ -1,4 +1,6 @@
+
 import copy
+
 
 def max_one_of(agentset, var):
     """

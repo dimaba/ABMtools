@@ -1,5 +1,8 @@
 
+from abmtools import agent
+
 g_ident = 0
+
 
 class Group:
     """
@@ -124,7 +127,7 @@ class Group:
         # Create n new agents in this group
         agents = []
         for _ in range(n):
-            agents.append(Agent(controller=self.controller, group=self.ident, *args, **kwargs))
+            agents.append(agent.Agent(controller=self.controller, group=self.ident, *args, **kwargs))
 
         self.members += agents
         self.controller.agents += agents

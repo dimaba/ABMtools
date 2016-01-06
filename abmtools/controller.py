@@ -1,4 +1,7 @@
+
 import collections
+from abmtools import agent, group
+
 
 class Controller:
     """
@@ -53,7 +56,7 @@ class Controller:
         self.n_agents = len(self.agents)
         self.n_groups = len(self.groups)
 
-    def create_agents(self, n=1, agenttype=Agent, agentlist='agents', *args, **kwargs):
+    def create_agents(self, n=1, agenttype=agent.Agent, agentlist='agents', *args, **kwargs):
         """
 
         Create Agents of a specified type (defaults to ABMTools.Agent), passing them setup arguments if necessary,
@@ -101,7 +104,7 @@ class Controller:
 
         self.clear_agents()
 
-    def create_groups(self, n=1, grouptype=Group, grouplist='groups', *args, **kwargs):
+    def create_groups(self, n=1, grouptype=group.Group, grouplist='groups', *args, **kwargs):
         """
 
         Create Groups of a specified type (defaults to ABMTools.Group), passing them setup arguments if necessary,
