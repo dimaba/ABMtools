@@ -15,5 +15,5 @@ This package is meant to provide base cases for these classes and functions, wit
 2. GUI. This will be a script-only package. You will not be able to start, stop or control your simulations through a graphical interface unless you design one yourself.
 3. Analysis tools. This package should be light-weight, with few dependencies outside of the Python 3 standard library. The best assistance this package can give to aid analysis is to output results in a way which established analysis tools (e.g. Matplotlib & pandas for Python, or other software like R) can read.
 
-In the ideal case this package and its dependencies should be reliably installable through a single command: `pip install abmtools`. This may not be entirely feasible, given that a package like Numpy (notoriously difficult to install through pip in a regular Python 3 environment) might prove necessary to make some parts of the package work efficiently. 
+In the ideal case this package and its dependencies should be reliably installable everywhere through a single command: `pip install abmtools`. This may not be entirely feasible, given that a package like Numpy (notoriously difficult to install through pip in a regular Python 3 environment on Windows) might prove necessary to make some parts of the package work efficiently. 
  In those cases parts of the package may be made optional.
