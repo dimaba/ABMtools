@@ -15,8 +15,10 @@ for line in raw_data:
 fs = [line[1] for line in data]
 fc = [line[2] for line in data]
 fr = [line[3] for line in data]
+sr = [line[6] for line in data]
 
 plt.plot(fs[:10000], 'r-')
 plt.plot(fc[:10000], 'y-')
 plt.plot(fr[:10000], 'b-')
+plt.plot(sr[:10000], 'pink')
 plt.show()

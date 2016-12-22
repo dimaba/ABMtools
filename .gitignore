@@ -55,3 +55,9 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Documents
+*.docx
+
+# Run results
+/abmtools/Tests/Results

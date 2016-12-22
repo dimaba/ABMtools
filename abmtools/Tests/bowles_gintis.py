@@ -47,12 +47,14 @@ class BGController(Controller):
         self.fraction_shirkers = None
         self.fraction_cooperators = None
         self.fraction_reciprocators = None
+        self.shirking_rate = None
 
         self.smallest_group_size = None
         self.largest_group_size = None
 
         self.reporters = collections.OrderedDict.fromkeys(['n_agents', 'fraction_shirkers', 'fraction_cooperators',
-                                                           'fraction_reciprocators', 'smallest_group_size', 'largest_group_size'])
+                                                           'fraction_reciprocators', 'smallest_group_size', 'largest_group_size',
+                                                            'shirking_rate'])
 
     def calculate_population_distribution(self):
         """
@@ -64,6 +66,7 @@ class BGController(Controller):
         self.fraction_shirkers = counter["shirker"] / len(self.agents)
         self.fraction_cooperators = counter["cooperator"] / len(self.agents)
         self.fraction_reciprocators = counter["reciprocator"] / len(self.agents)
+        self.shirking_rate = statistics.mean([a.shirking_decision for a in self.agents])
 
     def calculate_group_sizes(self):
         """
@@ -368,14 +371,16 @@ if __name__ == "__main__":
     def run():
         from datetime import datetime
         now = datetime.now()
-        for _ in range(10000):
+        for _ in range(1000):
             t.step()
         then = datetime.now()
         diff = then - now
         print(diff)
 
-    import cProfile
-    import pstats
-    cProfile.run('run()', 'Profiles/bowles_gintis')
-    p = pstats.Stats('Profiles/bowles_gintis')
-    p.strip_dirs().sort_stats('cumulative').print_stats()
+    #import cProfile
+    #import pstats
+    #cProfile.run('run()', 'Profiles/bowles_gintis')
+    #p = pstats.Stats('Profiles/bowles_gintis')
+    #p.strip_dirs().sort_stats('cumulative').print_stats()
+
+    run()
