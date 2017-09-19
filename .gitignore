@@ -61,3 +61,6 @@ target/
 
 # Run results
 /abmtools/Tests/Results
+
+# IDE stuff
+.idea
