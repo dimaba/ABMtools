@@ -107,8 +107,9 @@ class Ticker:
         args = self.step_func[1]
         kwargs = self.step_func[2]
         func(*args, **kwargs)
+
         if write and self.ticks == 0:
-            self.write_to_file(self.header(), method='w')
+            self.write_to_file(self.header(), method='w+')
         if write and self.ticks % self.interval in (0, 1):
             self.write_to_file(self.report(), method='a')
         self.ticks += 1

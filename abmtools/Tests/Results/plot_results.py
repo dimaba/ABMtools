@@ -1,4 +1,6 @@
+import matplotlib
 import matplotlib.pyplot as plt
+matplotlib.use('TKAgg')
 
 raw_data = []
 with open('run.txt') as f:

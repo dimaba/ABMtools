@@ -171,10 +171,10 @@ def compile_typeset(individuals=None, iterables=None, instancetype=None):
     Args:
     :param individuals=None (iterable): A single iterable of individual instances
     :param iterables=None (iterable of iterables): An iterable which itself holds iterables of individaul instances.
-        This is thee way to compile multiple lists of instances
+        This is the way to compile multiple lists of instances
     :param instancetype=None (Class): Type of instance to include in the final typeset. The function checks for each
-        instance whether it an instance of the specified Class or any of its subclasses. If None no checks for type
-        are done
+        instance whether it an instance of the specified Class or any of its subclasses. If None the typeset remains 
+        empty
 
 
     :return:

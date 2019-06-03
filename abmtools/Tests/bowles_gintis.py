@@ -10,6 +10,14 @@ import collections
 import statistics
 
 """
+This replicates the model proposed by Bowles and Gintis (2004) in a paper titled
+The evolution of strong reciprocity: Cooperation in heterogeneous populations.
+
+The model was initially replicated in NetLogo (with unexpected results).
+The expected outcome is that after sufficient iterations the population reaches
+an equilibrium between shirkers (defectors), (unconditional) cooperators and
+reciprocators (cooperators who punish) and low rates of shirking.
+
 Three types of agents:
     1. cooperators
     2. shirkers

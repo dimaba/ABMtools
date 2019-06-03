@@ -1,4 +1,6 @@
 # EXAMPLE MODEL : COPY OF NETLOGO 'PARTY' MODEL
+# See https://ccl.northwestern.edu/netlogo/models/Party for specifications
+
 import os
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0,parentdir)
@@ -40,13 +42,16 @@ class Partier(abmtools.Agent):
 
 ########################################################################################
 
+# This is a simple model which does not make use of a separate ticker to manage steps
+# Mainly because the model does not track and output variables to a data file
 # One run of the model can go like this
+
 def setup(n=70, k=10, tolerance=25):
         ### Setup
         # Create the party
     c = Party(n, k, tolerance)
         # Populate the party
-    c.create_groups(c.k)
+    c.create_groups(c.k)  # Defaults to the standard abmtools.Group since no custom group class was specified
     for _ in range(n):
         c.create_agents(1, Partier, sex=random.choice(["M","F"]), group=random.choice([i for i in c.groups]))
 
@@ -63,9 +68,9 @@ def setup(n=70, k=10, tolerance=25):
     return c
 
 def step(c, i):
-        ### One Step
-        # Stop if all turtles are happy
-    #print("Happy agents: {}".format(sum([a.happy for a in c.agents])))
+    ### One Step
+        # Stop if all agents are happy (model converged)
+    print("Happy agents: {}".format(sum([a.happy for a in c.agents])))
     if all([a.happy for a in c.agents]):
         print("ALL AGENTS HAPPY, TERMINATING")
         print("Step {}".format(i))
@@ -92,5 +97,5 @@ def step(c, i):
 
 if __name__ == '__main__':
     c = setup()
-    for i in range(2000):
+    for i in range(2000): # Max 2000 steps, but stops earlier when converged
         step(c, i)
